@@ -1,8 +1,6 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
 import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/shared/enums.dart';
+import 'package:grubpac/core/utils/mock_data.dart';
 import 'package:grubpac/core/utils/parsing_santizer.dart';
 import 'package:grubpac/features/auth/data/data_sources/i_auth_remote_ds.dart';
 import 'package:grubpac/features/auth/data/models/auth_request_model.dart';
@@ -16,11 +14,7 @@ class AuthRemoteDsImpl implements IAuthRemoteDs {
   Future<UserSessionModel> login({required AuthRequestModel request}) async {
     await Future.delayed(_mockDelay);
 
-    final jsonString = await rootBundle.loadString(
-      AppInternalStrings.mockDataAsset,
-    );
-
-    final data = _decodeJsonMap(jsonString);
+    final data = await MockApiResponse.load();
 
     final authMock = _mapValue(data[AppJsonKeys.authMock]);
 
@@ -90,11 +84,7 @@ class AuthRemoteDsImpl implements IAuthRemoteDs {
   }) async {
     await Future.delayed(_mockDelay);
 
-    final jsonString = await rootBundle.loadString(
-      AppInternalStrings.mockDataAsset,
-    );
-
-    final data = _decodeJsonMap(jsonString);
+    final data = await MockApiResponse.load();
 
     final authMock = _mapValue(data[AppJsonKeys.authMock]);
 
@@ -112,17 +102,6 @@ class AuthRemoteDsImpl implements IAuthRemoteDs {
         response[AppJsonKeys.refreshTokenExpiresInSeconds],
       ),
     );
-  }
-
-  Map<String, dynamic> _decodeJsonMap(String value) {
-    try {
-      return sanitizeWithType<Map<String, dynamic>>(
-        jsonDecode(value),
-        defaultValue: <String, dynamic>{},
-      );
-    } on FormatException {
-      return <String, dynamic>{};
-    }
   }
 
   Map<String, dynamic> _mapValue(dynamic value) {
