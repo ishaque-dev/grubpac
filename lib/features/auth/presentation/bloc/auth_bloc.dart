@@ -1,5 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show Bloc, Emitter;
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/usecase/use_case.dart';
 import 'package:grubpac/features/auth/domain/entities/auth_request_entity.dart';
@@ -28,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _login;
   final LogoutUseCase _logout;
   final RefreshSessionUseCase _refreshSession;
+  Timer? _refreshTimer;
 
   Future<void> _onSessionRequested(
     AuthSessionRequested event,
@@ -35,12 +38,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await _getSavedSession(parameters: NoParam());
-    result.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (session) => emit(
-        session == null ? AuthUnauthenticated() : AuthAuthenticated(session),
-      ),
-    );
+    result.fold((failure) => emit(AuthFailure(failure.message)), (
+      session,
+    ) async {
+      if (session == null) {
+        emit(AuthUnauthenticated());
+      } else if (session.isAccessTokenExpired &&
+          !session.isRefreshTokenExpired) {
+        await _refresh(emit);
+      } else {
+        _emitAuthenticated(session, emit);
+      }
+    });
   }
 
   Future<void> _onLoginRequested(
@@ -56,7 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
-      (session) => emit(AuthAuthenticated(session)),
+      (session) => _emitAuthenticated(session, emit),
     );
   }
 
@@ -66,21 +75,52 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await _logout(parameters: NoParam());
-    result.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (_) => emit(AuthUnauthenticated()),
-    );
+    result.fold((failure) => emit(AuthFailure(failure.message)), (_) {
+      _refreshTimer?.cancel();
+      emit(AuthUnauthenticated());
+    });
   }
 
   Future<void> _onRefreshRequested(
     AuthRefreshRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    if (state is! AuthAuthenticated) {
+      emit(AuthLoading());
+    }
+    await _refresh(emit);
+  }
+
+  Future<void> _refresh(Emitter<AuthState> emit) async {
     final result = await _refreshSession(parameters: NoParam());
-    result.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (session) => emit(AuthAuthenticated(session)),
+    result.fold((failure) {
+      _refreshTimer?.cancel();
+      emit(AuthFailure(failure.message));
+    }, (session) => _emitAuthenticated(session, emit));
+  }
+
+  void _emitAuthenticated(UserSessionEntity session, Emitter<AuthState> emit) {
+    emit(AuthAuthenticated(session));
+    _scheduleRefresh(session);
+  }
+
+  void _scheduleRefresh(UserSessionEntity session) {
+    _refreshTimer?.cancel();
+    if (session.isRefreshTokenExpired) return;
+    final refreshIn = session.accessTokenExpiresAt
+        .subtract(const Duration(seconds: 30))
+        .difference(DateTime.now());
+    _refreshTimer = Timer(
+      refreshIn.isNegative || refreshIn == Duration.zero
+          ? const Duration(seconds: 1)
+          : refreshIn,
+      () => add(AuthRefreshRequested()),
     );
+  }
+
+  @override
+  Future<void> close() {
+    _refreshTimer?.cancel();
+    return super.close();
   }
 }

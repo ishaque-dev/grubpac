@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:grubpac/core/di/di.dart';
+import 'package:grubpac/core/router/app_router.dart';
+import 'package:grubpac/core/theme/app_theme.dart';
+import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
+import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -7,71 +14,52 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
+  State<MyApp> createState() => _MyAppState();
+}
 
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+class _MyAppState extends State<MyApp> {
+  late final AuthBloc _authBloc;
+  late final AppRouter _appRouter;
+
+  @override
+  void initState() {
+    super.initState();
+    _authBloc = serviceLocator<AuthBloc>()..add(AuthSessionRequested());
+    _appRouter = AppRouter(authBloc: _authBloc);
   }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-  final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
+  void dispose() {
+    _appRouter.dispose();
+    _authBloc.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
-      ),
-      body: Center(
-
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthBloc>.value(value: _authBloc),
+            BlocProvider(create: (context) => serviceLocator<ProjectsBloc>()),
+            BlocProvider(create: (context) => serviceLocator<TaskBloc>()),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+          child: MaterialApp.router(
+            title: 'TaskFlow',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.dark,
+            routerConfig: _appRouter.router,
+          ),
+        );
+      },
     );
   }
 }

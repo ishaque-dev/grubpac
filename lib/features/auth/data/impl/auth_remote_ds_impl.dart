@@ -1,4 +1,5 @@
 import 'package:grubpac/core/constants/app_strings.dart';
+import 'package:grubpac/core/error/common_failures.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/utils/mock_data.dart';
 import 'package:grubpac/core/utils/parsing_santizer.dart';
@@ -28,7 +29,11 @@ class AuthRemoteDsImpl implements IAuthRemoteDs {
                   request.email &&
               sanitizeWithType<String>(credential[AppJsonKeys.password]) ==
                   request.password,
+          orElse: () => {},
         );
+    if (matchingCredential.isEmpty) {
+      throw DefaultFailure(message: "Invalid Username or password");
+    }
 
     final users = _listValue(data[AppJsonKeys.users]);
 
