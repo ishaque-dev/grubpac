@@ -1,6 +1,6 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
@@ -30,7 +30,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     required this._updateTaskPriority,
     required this._assignTask,
     required this._unassignTask,
-  })  : super(TaskInitial()) {
+  }) : super(TaskInitial()) {
     on<TasksLoadRequested>(_onTasksLoadRequested);
     on<TaskLoadRequested>(_onTaskLoadRequested);
     on<TaskCreateRequested>(_onCreateRequested);
@@ -99,8 +99,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     );
     result.fold(
       (failure) => emit(TaskFailure(failure.message, tasks: previous)),
-      (task) =>
-          emit(TaskLoaded(tasks: [...previous, task], selectedTask: task)),
+      (task) => emit(
+        TaskLoaded(
+          tasks: [...previous, task],
+          selectedTask: task,
+          message: AppUiStrings.taskCreated,
+        ),
+      ),
     );
   }
 
@@ -110,6 +115,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   ) async {
     await _runTaskMutation(
       emit,
+      AppUiStrings.taskUpdated,
       () => _updateTask(
         parameters: TaskRequestParams(
           request: event.task,
@@ -133,6 +139,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       (_) => emit(
         TaskLoaded(
           tasks: previous.where((task) => task.id != event.taskId).toList(),
+          message: AppUiStrings.taskDeleted,
         ),
       ),
     );
@@ -144,6 +151,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   ) async {
     await _runTaskMutation(
       emit,
+      AppUiStrings.taskStatusUpdated,
       () => _updateTaskStatus(
         parameters: UpdateTaskStatusParams(
           taskId: event.taskId,
@@ -160,6 +168,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   ) async {
     await _runTaskMutation(
       emit,
+      AppUiStrings.taskPriorityUpdated,
       () => _updateTaskPriority(
         parameters: UpdateTaskPriorityParams(
           taskId: event.taskId,
@@ -176,6 +185,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   ) async {
     await _runTaskMutation(
       emit,
+      AppUiStrings.taskAssigned,
       () => _assignTask(
         parameters: AssignTaskParams(
           taskId: event.taskId,
@@ -192,6 +202,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   ) async {
     await _runTaskMutation(
       emit,
+      AppUiStrings.taskUnassigned,
       () => _unassignTask(
         parameters: TaskIdParams(taskId: event.taskId, session: event.session),
       ),
@@ -200,6 +211,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
   Future<void> _runTaskMutation(
     Emitter<TaskState> emit,
+    String successMessage,
     Future<dynamic> Function() operation,
   ) async {
     final previous = _tasks;
@@ -214,6 +226,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
               if (current.id == task.id) task else current,
           ],
           selectedTask: task,
+          message: successMessage,
         ),
       ),
     );

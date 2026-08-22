@@ -64,6 +64,19 @@ abstract final class AppUiStrings {
   static const String projectNotFound = 'Project not found';
   static const String projectAdminOnly =
       'Only organization admins can perform this action.';
+  static const String projectCreated = 'Project created successfully.';
+  static const String projectUpdated = 'Project updated successfully.';
+  static const String projectDeleted = 'Project deleted successfully.';
+  static const String taskCreated = 'Task created successfully.';
+  static const String taskUpdated = 'Task updated successfully.';
+  static const String taskDeleted = 'Task deleted successfully.';
+  static const String taskStatusUpdated = 'Task status updated successfully.';
+  static const String taskPriorityUpdated =
+      'Task priority updated successfully.';
+  static const String taskAssigned = 'Task assigned successfully.';
+  static const String taskUnassigned = 'Task unassigned successfully.';
+  static const String logoutQuestion = 'SIGN OUT?';
+  static const String logoutWarning = 'Are you sure you want to sign out?';
 }
 
 abstract final class AppInternalStrings {

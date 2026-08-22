@@ -12,10 +12,15 @@ final class ProjectsInitial extends ProjectsState {}
 final class ProjectsLoading extends ProjectsState {}
 
 final class ProjectsLoaded extends ProjectsState {
-  const ProjectsLoaded({required this.projects, this.selectedProject});
+  const ProjectsLoaded({
+    required this.projects,
+    this.selectedProject,
+    this.message,
+  });
 
   final List<ProjectEntity> projects;
   final ProjectEntity? selectedProject;
+  final String? message;
 
   ProjectsLoaded copyWith({
     List<ProjectEntity>? projects,
@@ -31,7 +36,7 @@ final class ProjectsLoaded extends ProjectsState {
   }
 
   @override
-  List<Object?> get props => [projects, selectedProject];
+  List<Object?> get props => [projects, selectedProject, message];
 }
 
 final class ProjectsFailure extends ProjectsState {

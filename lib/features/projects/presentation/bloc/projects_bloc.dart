@@ -1,6 +1,6 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/features/projects/domain/entities/create_project_request_entity.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
@@ -22,7 +22,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
     required this._createProject,
     required this._updateProject,
     required this._deleteProject,
-  })  : super(ProjectsInitial()) {
+  }) : super(ProjectsInitial()) {
     on<ProjectsLoadRequested>(_onLoadRequested);
     on<ProjectLoadRequested>(_onProjectLoadRequested);
     on<ProjectCreateRequested>(_onCreateRequested);
@@ -86,7 +86,12 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
     );
     result.fold(
       (failure) => emit(ProjectsFailure(failure.message, projects: previous)),
-      (project) => emit(ProjectsLoaded(projects: [...previous, project])),
+      (project) => emit(
+        ProjectsLoaded(
+          projects: [...previous, project],
+          message: AppUiStrings.projectCreated,
+        ),
+      ),
     );
   }
 
@@ -116,6 +121,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
               if (current.id == project.id) project else current,
           ],
           selectedProject: project,
+          message: AppUiStrings.projectUpdated,
         ),
       ),
     );
@@ -140,6 +146,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
           projects: previous
               .where((project) => project.id != event.projectId)
               .toList(),
+          message: AppUiStrings.projectDeleted,
         ),
       ),
     );

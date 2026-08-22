@@ -5,6 +5,7 @@ import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
+import 'package:grubpac/core/widgets/app_snackbar.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
 import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
@@ -110,43 +111,52 @@ class _TasksPageState extends State<TasksPage>
           ],
         ),
       ),
-      body: BlocBuilder<TaskBloc, TaskState>(
-        builder: (context, state) {
-          if (state is TaskLoading && state is! TaskLoaded) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.lime),
-            );
+      body: BlocListener<TaskBloc, TaskState>(
+        listener: (context, state) {
+          if (state is TaskFailure) {
+            AppSnackbar.showError(context, state.message);
+          } else if (state is TaskLoaded && state.message != null) {
+            AppSnackbar.showSuccess(context, state.message!);
           }
+        },
+        child: BlocBuilder<TaskBloc, TaskState>(
+          builder: (context, state) {
+            if (state is TaskLoading && state is! TaskLoaded) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.lime),
+              );
+            }
 
-          final allTasks = state is TaskLoaded
-              ? state.tasks
-              : state is TaskFailure
-              ? state.tasks
-              : const <TaskEntity>[];
+            final allTasks = state is TaskLoaded
+                ? state.tasks
+                : state is TaskFailure
+                ? state.tasks
+                : const <TaskEntity>[];
 
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              _TaskList(
-                tasks: allTasks,
-                onStatusTap: _updateStatus,
-                onPriorityTap: _updatePriority,
-                session: widget.session,
-              ),
-              ...TaskStatus.values.map((status) {
-                final filtered = allTasks
-                    .where((t) => t.status == status)
-                    .toList();
-                return _TaskList(
-                  tasks: filtered,
+            return TabBarView(
+              controller: _tabController,
+              children: [
+                _TaskList(
+                  tasks: allTasks,
                   onStatusTap: _updateStatus,
                   onPriorityTap: _updatePriority,
                   session: widget.session,
-                );
-              }),
-            ],
-          );
-        },
+                ),
+                ...TaskStatus.values.map((status) {
+                  final filtered = allTasks
+                      .where((t) => t.status == status)
+                      .toList();
+                  return _TaskList(
+                    tasks: filtered,
+                    onStatusTap: _updateStatus,
+                    onPriorityTap: _updatePriority,
+                    session: widget.session,
+                  );
+                }),
+              ],
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showCreateSheet,

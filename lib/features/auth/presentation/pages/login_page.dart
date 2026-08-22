@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/core/utils/app_validators.dart';
+import 'package:grubpac/core/widgets/app_snackbar.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
 
 class LoginPage extends StatefulWidget {
@@ -42,12 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textAlign: TextAlign.center),
-                backgroundColor: AppColors.danger,
-              ),
-            );
+            AppSnackbar.showError(context, state.message);
           }
         },
         child: SafeArea(
