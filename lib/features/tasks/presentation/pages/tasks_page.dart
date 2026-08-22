@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
@@ -91,7 +92,7 @@ class _TasksPageState extends State<TasksPage>
               style: AppText.display(size: 24.sp),
             ),
             Text(
-              'TASK LIST',
+              AppUiStrings.taskList,
               style: AppText.mono(size: 11.sp, color: AppColors.textMuted),
             ),
           ],
@@ -104,7 +105,7 @@ class _TasksPageState extends State<TasksPage>
           unselectedLabelColor: AppColors.textMuted,
           labelStyle: AppText.mono(size: 10.sp, weight: FontWeight.w700),
           tabs: [
-            const Tab(text: 'ALL'),
+            const Tab(text: AppUiStrings.all),
             ...TaskStatus.values.map((s) => Tab(text: s.name.toUpperCase())),
           ],
         ),
@@ -173,7 +174,7 @@ class _TaskList extends StatelessWidget {
     if (tasks.isEmpty) {
       return Center(
         child: Text(
-          'NO TASKS IN THIS CATEGORY',
+          AppUiStrings.noTasks,
           style: AppText.mono(size: 12.sp, color: AppColors.textFaint),
         ),
       );
@@ -196,25 +197,25 @@ class _TaskList extends StatelessWidget {
                 builder: (context) => AlertDialog(
                   backgroundColor: AppColors.card,
                   title: Text(
-                    'DELETE TASK',
+                    AppUiStrings.deleteTask,
                     style: AppText.display(size: 20.sp),
                   ),
                   content: Text(
-                    'Are you sure you want to delete this task?',
+                    AppUiStrings.taskDeleteQuestion,
                     style: AppText.body(),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
                       child: Text(
-                        'CANCEL',
+                        AppUiStrings.cancel,
                         style: AppText.mono(color: AppColors.textMuted),
                       ),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
                       child: Text(
-                        'DELETE',
+                        AppUiStrings.delete,
                         style: AppText.mono(color: AppColors.danger),
                       ),
                     ),

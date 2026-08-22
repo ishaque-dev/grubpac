@@ -11,6 +11,32 @@ class AppValidators {
     if (value.trim().length < 3) {
       return AppStrings.nameTooShort;
     }
+    if (value.trim().length > 100) {
+      return AppStrings.nameTooLong;
+    }
+    return null;
+  }
+
+  static String? descriptionValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.descriptionRequired;
+    }
+    if (value.trim().length > 500) {
+      return AppStrings.descriptionTooLong;
+    }
+    return null;
+  }
+
+  static String? titleValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.titleRequired;
+    }
+    if (value.trim().length < 3) {
+      return AppStrings.titleTooShort;
+    }
+    if (value.trim().length > 100) {
+      return AppStrings.titleTooLong;
+    }
     return null;
   }
 
@@ -38,8 +64,6 @@ class AppValidators {
     }
     return null;
   }
-
-
 
   static String? passwordValidator(String? value) {
     if (value == null || value.isEmpty) {

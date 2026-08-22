@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
@@ -53,16 +54,21 @@ class _ProjectsPageState extends State<ProjectsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('DELETE PROJECT?'),
-        content: Text('This will permanently delete ${project.name}.'),
+        title: const Text(AppUiStrings.deleteProjectQuestion),
+        content: Text(
+          AppUiStrings.projectDeleteWarning.replaceFirst(
+            '{name}',
+            project.name,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('CANCEL'),
+            child: const Text(AppUiStrings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('DELETE'),
+            child: const Text(AppUiStrings.delete),
           ),
         ],
       ),
@@ -78,11 +84,11 @@ class _ProjectsPageState extends State<ProjectsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PROJECTS', style: AppText.display(size: 28.sp)),
+        title: Text(AppUiStrings.projects, style: AppText.display(size: 28.sp)),
         centerTitle: false,
         actions: [
           IconButton(
-            tooltip: 'Sign out',
+            tooltip: AppUiStrings.signOut,
             onPressed: () =>
                 context.read<AuthBloc>().add(AuthLogoutRequested()),
             icon: const Icon(Icons.logout),
@@ -116,7 +122,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                   ),
                   SizedBox(height: 16.h),
                   Text(
-                    'NO PROJECTS FOUND',
+                    AppUiStrings.noProjects,
                     style: AppText.mono(
                       size: 14.sp,
                       color: AppColors.textMuted,
@@ -168,7 +174,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
         onPressed: _showCreateSheet,
         icon: const Icon(Icons.add),
         label: Text(
-          'NEW PROJECT',
+          AppUiStrings.newProject,
           style: AppText.mono(size: 12.sp, weight: FontWeight.w700),
         ),
       ),

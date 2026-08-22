@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 
@@ -43,7 +44,7 @@ class ProjectCard extends StatelessWidget {
                       _StatusChip(status: project.status),
                       if (onEdit != null || onDelete != null)
                         PopupMenuButton<String>(
-                          tooltip: 'Project actions',
+                          tooltip: AppUiStrings.projectActions,
                           onSelected: (value) {
                             if (value == 'edit') onEdit?.call();
                             if (value == 'delete') onDelete?.call();
@@ -52,12 +53,12 @@ class ProjectCard extends StatelessWidget {
                             if (onEdit != null)
                               const PopupMenuItem(
                                 value: 'edit',
-                                child: Text('EDIT PROJECT'),
+                                child: Text(AppUiStrings.edit),
                               ),
                             if (onDelete != null)
                               const PopupMenuItem(
                                 value: 'delete',
-                                child: Text('DELETE PROJECT'),
+                                child: Text(AppUiStrings.deleteProject),
                               ),
                           ],
                         ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:grubpac/features/auth/presentation/pages/login_page.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
@@ -56,7 +57,7 @@ class AppRouter {
                     : _findProject(context, state.pathParameters['projectId']);
                 if (authState is! AuthAuthenticated || project == null) {
                   return const Scaffold(
-                    body: Center(child: Text('Project not found')),
+                    body: Center(child: Text(AppUiStrings.projectNotFound)),
                   );
                 }
                 return TasksPage(project: project, session: authState.session);

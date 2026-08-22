@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
+import 'package:grubpac/core/utils/app_validators.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 
 class CreateProjectSheet extends StatefulWidget {
@@ -29,12 +31,12 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
   void _onSubmit() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<ProjectsBloc>().add(
-            ProjectCreateRequested(
-              name: _nameController.text.trim(),
-              description: _descController.text.trim(),
-              session: widget.session,
-            ),
-          );
+        ProjectCreateRequested(
+          name: _nameController.text.trim(),
+          description: _descController.text.trim(),
+          session: widget.session,
+        ),
+      );
       Navigator.pop(context);
     }
   }
@@ -54,31 +56,32 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'NEW PROJECT',
-              style: AppText.display(size: 24.sp),
-            ),
+            Text(AppUiStrings.newProject, style: AppText.display(size: 24.sp)),
             SizedBox(height: 24.h),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(hintText: 'PROJECT NAME'),
+              decoration: const InputDecoration(
+                hintText: AppUiStrings.projectName,
+              ),
               style: AppText.body(),
-              validator: (value) => value?.isEmpty ?? true ? 'Name required' : null,
+              validator: AppValidators.nameValidator,
             ),
             SizedBox(height: 16.h),
             TextFormField(
               controller: _descController,
-              decoration: const InputDecoration(hintText: 'DESCRIPTION'),
+              decoration: const InputDecoration(
+                hintText: AppUiStrings.description,
+              ),
               style: AppText.body(),
               maxLines: 3,
-              validator: (value) => value?.isEmpty ?? true ? 'Description required' : null,
+              validator: AppValidators.descriptionValidator,
             ),
             SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _onSubmit,
-                child: const Text('CREATE PROJECT'),
+                child: const Text(AppUiStrings.createProject),
               ),
             ),
             SizedBox(height: 24.h),

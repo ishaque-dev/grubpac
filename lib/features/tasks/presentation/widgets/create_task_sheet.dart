@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
+import 'package:grubpac/core/utils/app_validators.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
 import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
 
 class CreateTaskSheet extends StatefulWidget {
-  const CreateTaskSheet({super.key, required this.projectId, required this.session});
+  const CreateTaskSheet({
+    super.key,
+    required this.projectId,
+    required this.session,
+  });
 
   final String projectId;
   final UserSessionEntity session;
@@ -60,19 +66,19 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
   void _onSubmit() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<TaskBloc>().add(
-            TaskCreateRequested(
-              task: TaskEntity(
-                projectId: widget.projectId,
-                title: _titleController.text.trim(),
-                description: _descController.text.trim(),
-                status: _status,
-                priority: _priority,
-                dueDate: _dueDate,
-                createdAt: DateTime.now(),
-              ),
-              session: widget.session,
-            ),
-          );
+        TaskCreateRequested(
+          task: TaskEntity(
+            projectId: widget.projectId,
+            title: _titleController.text.trim(),
+            description: _descController.text.trim(),
+            status: _status,
+            priority: _priority,
+            dueDate: _dueDate,
+            createdAt: DateTime.now(),
+          ),
+          session: widget.session,
+        ),
+      );
       Navigator.pop(context);
     }
   }
@@ -93,28 +99,32 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('NEW TASK', style: AppText.display(size: 24.sp)),
+              Text(AppUiStrings.newTask, style: AppText.display(size: 24.sp)),
               SizedBox(height: 24.h),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(hintText: 'TASK TITLE'),
+                decoration: const InputDecoration(
+                  hintText: AppUiStrings.taskTitle,
+                ),
                 style: AppText.body(),
-                validator: (value) => value?.isEmpty ?? true ? 'Title required' : null,
+                validator: AppValidators.titleValidator,
               ),
               SizedBox(height: 16.h),
               TextFormField(
                 controller: _descController,
-                decoration: const InputDecoration(hintText: 'DESCRIPTION'),
+                decoration: const InputDecoration(
+                  hintText: AppUiStrings.description,
+                ),
                 style: AppText.body(),
                 maxLines: 3,
-                validator: (value) => value?.isEmpty ?? true ? 'Description required' : null,
+                validator: AppValidators.descriptionValidator,
               ),
               SizedBox(height: 16.h),
               Row(
                 children: [
                   Expanded(
                     child: _DropdownField<TaskStatus>(
-                      label: 'STATUS',
+                      label: AppUiStrings.status,
                       value: _status,
                       items: TaskStatus.values,
                       onChanged: (v) => setState(() => _status = v!),
@@ -123,7 +133,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                   SizedBox(width: 16.w),
                   Expanded(
                     child: _DropdownField<TaskPriority>(
-                      label: 'PRIORITY',
+                      label: AppUiStrings.priority,
                       value: _priority,
                       items: TaskPriority.values,
                       onChanged: (v) => setState(() => _priority = v!),
@@ -142,11 +152,17 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                   ),
                   child: Row(
                     children: [
-                      Text('DUE DATE', style: AppText.body(color: AppColors.textFaint)),
+                      Text(
+                        AppUiStrings.dueDate,
+                        style: AppText.body(color: AppColors.textFaint),
+                      ),
                       const Spacer(),
                       Text(
                         '${_dueDate.day}/${_dueDate.month}/${_dueDate.year}',
-                        style: AppText.mono(color: AppColors.lime, weight: FontWeight.w700),
+                        style: AppText.mono(
+                          color: AppColors.lime,
+                          weight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
@@ -157,7 +173,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _onSubmit,
-                  child: const Text('CREATE TASK'),
+                  child: const Text(AppUiStrings.createTask),
                 ),
               ),
               SizedBox(height: 24.h),
@@ -187,18 +203,28 @@ class _DropdownField<T extends Enum> extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppText.mono(size: 10.sp, color: AppColors.textFaint)),
+        Text(
+          label,
+          style: AppText.mono(size: 10.sp, color: AppColors.textFaint),
+        ),
         SizedBox(height: 4.h),
         DropdownButtonFormField<T>(
           initialValue: value,
           items: items
-              .map((e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(e.name.toUpperCase(), style: AppText.mono(size: 12.sp)),
-                  ))
+              .map(
+                (e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(
+                    e.name.toUpperCase(),
+                    style: AppText.mono(size: 12.sp),
+                  ),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
-          decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12)),
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 12),
+          ),
           dropdownColor: AppColors.card,
           icon: const Icon(Icons.arrow_drop_down, color: AppColors.lime),
         ),

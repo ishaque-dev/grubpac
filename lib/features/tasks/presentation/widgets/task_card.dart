@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
@@ -35,6 +36,7 @@ class TaskCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
+                  tooltip: AppUiStrings.deleteTask,
                   onPressed: onDelete,
                   icon: Icon(
                     Icons.delete_outline,

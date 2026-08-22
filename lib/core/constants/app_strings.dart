@@ -14,6 +14,54 @@ abstract final class AppStrings {
       'Password must be at least 6 characters.';
   static const String durationRequired = 'Duration is required.';
   static const String validDuration = 'Enter a valid duration.';
+
+  static const String descriptionRequired = 'Description is required.';
+  static const String descriptionTooLong =
+      'Description must be 500 characters or fewer.';
+  static const String titleRequired = 'Title is required.';
+  static const String titleTooShort = 'Title must be at least 3 characters.';
+  static const String titleTooLong = 'Title must be 100 characters or fewer.';
+  static const String nameTooLong = 'Name must be 100 characters or fewer.';
+}
+
+abstract final class AppUiStrings {
+  static const String appName = 'TASKFLOW';
+  static const String tagline = 'MANAGE. EXECUTE. DELIVER.';
+  static const String signIn = 'SIGN IN';
+  static const String emailAddress = 'EMAIL ADDRESS';
+  static const String password = 'PASSWORD';
+  static const String login = 'LOGIN TO DASHBOARD';
+  static const String forgotPassword = 'FORGOT PASSWORD?';
+  static const String projects = 'PROJECTS';
+  static const String projectName = 'PROJECT NAME';
+  static const String taskList = 'TASK LIST';
+  static const String all = 'ALL';
+  static const String noProjects = 'NO PROJECTS FOUND';
+  static const String noTasks = 'NO TASKS IN THIS CATEGORY';
+  static const String newProject = 'NEW PROJECT';
+  static const String editProject = 'EDIT PROJECT';
+  static const String deleteProject = 'DELETE PROJECT';
+  static const String deleteProjectQuestion = 'DELETE PROJECT?';
+  static const String projectDeleteWarning =
+      'This will permanently delete {name}.';
+  static const String newTask = 'NEW TASK';
+  static const String taskTitle = 'TASK TITLE';
+  static const String description = 'DESCRIPTION';
+  static const String status = 'STATUS';
+  static const String priority = 'PRIORITY';
+  static const String dueDate = 'DUE DATE';
+  static const String createProject = 'CREATE PROJECT';
+  static const String saveChanges = 'SAVE CHANGES';
+  static const String createTask = 'CREATE TASK';
+  static const String cancel = 'CANCEL';
+  static const String delete = 'DELETE';
+  static const String edit = 'EDIT PROJECT';
+  static const String deleteTask = 'DELETE TASK';
+  static const String taskDeleteQuestion =
+      'Are you sure you want to delete this task?';
+  static const String signOut = 'Sign out';
+  static const String projectActions = 'Project actions';
+  static const String projectNotFound = 'Project not found';
 }
 
 abstract final class AppInternalStrings {

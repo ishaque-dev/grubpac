@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
+import 'package:grubpac/core/utils/app_validators.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 
@@ -69,28 +71,30 @@ class _EditProjectSheetState extends State<EditProjectSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('EDIT PROJECT', style: AppText.display(size: 24.sp)),
+            Text(AppUiStrings.editProject, style: AppText.display(size: 24.sp)),
             SizedBox(height: 24.h),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(hintText: 'PROJECT NAME'),
-              validator: (value) =>
-                  value?.trim().isEmpty ?? true ? 'Name required' : null,
+              decoration: const InputDecoration(
+                hintText: AppUiStrings.projectName,
+              ),
+              validator: AppValidators.nameValidator,
             ),
             SizedBox(height: 16.h),
             TextFormField(
               controller: _descriptionController,
-              decoration: const InputDecoration(hintText: 'DESCRIPTION'),
+              decoration: const InputDecoration(
+                hintText: AppUiStrings.description,
+              ),
               maxLines: 3,
-              validator: (value) =>
-                  value?.trim().isEmpty ?? true ? 'Description required' : null,
+              validator: AppValidators.descriptionValidator,
             ),
             SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _onSubmit,
-                child: const Text('SAVE CHANGES'),
+                child: const Text(AppUiStrings.saveChanges),
               ),
             ),
             SizedBox(height: 24.h),

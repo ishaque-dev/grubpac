@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
+import 'package:grubpac/core/utils/app_validators.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
 
 class LoginPage extends StatefulWidget {
@@ -58,45 +60,40 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   SizedBox(height: 60.h),
                   Text(
-                    'TASKFLOW',
+                    AppUiStrings.appName,
                     style: AppText.display(size: 44.sp, color: AppColors.lime),
                   ),
                   Text(
-                    'MANAGE. EXECUTE. DELIVER.',
+                    AppUiStrings.tagline,
                     style: AppText.mono(
                       size: 12.sp,
                       color: AppColors.textMuted,
                     ),
                   ),
                   SizedBox(height: 48.h),
-                  Text('SIGN IN', style: AppText.display(size: 28.sp)),
+                  Text(
+                    AppUiStrings.signIn,
+                    style: AppText.display(size: 28.sp),
+                  ),
                   SizedBox(height: 24.h),
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      hintText: 'EMAIL ADDRESS',
+                      hintText: AppUiStrings.emailAddress,
                     ),
                     keyboardType: TextInputType.emailAddress,
                     style: AppText.body(),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      return null;
-                    },
+                    validator: AppValidators.emailValidator,
                   ),
                   SizedBox(height: 16.h),
                   TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(hintText: 'PASSWORD'),
+                    decoration: const InputDecoration(
+                      hintText: AppUiStrings.password,
+                    ),
                     obscureText: true,
                     style: AppText.body(),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                    },
+                    validator: AppValidators.passwordValidator,
                   ),
                   const Spacer(),
                   BlocBuilder<AuthBloc, AuthState>(
@@ -114,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                                     color: AppColors.bg,
                                   ),
                                 )
-                              : const Text('LOGIN TO DASHBOARD'),
+                              : const Text(AppUiStrings.login),
                         ),
                       );
                     },
@@ -124,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextButton(
                       onPressed: () {},
                       child: Text(
-                        'FORGOT PASSWORD?',
+                        AppUiStrings.forgotPassword,
                         style: AppText.mono(
                           size: 11.sp,
                           color: AppColors.textMuted,
