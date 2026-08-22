@@ -48,4 +48,9 @@ abstract final class AppJsonKeys {
   static const String taskCount = 'task_count';
   static const String status = 'status';
   static const String createdAt = 'created_at';
+  static const String tasks = 'tasks';
+  static const String title = 'title';
+  static const String priority = 'priority';
+  static const String assigneeId = 'assignee_id';
+  static const String dueDate = 'due_date';
 }

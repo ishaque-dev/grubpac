@@ -11,6 +11,21 @@ import 'package:grubpac/features/projects/domain/use_cases/delete_project_use_ca
 import 'package:grubpac/features/projects/domain/use_cases/get_project_by_id_use_case.dart';
 import 'package:grubpac/features/projects/domain/use_cases/get_projects_use_case.dart';
 import 'package:grubpac/features/projects/domain/use_cases/update_project_use_case.dart';
+import 'package:grubpac/features/tasks/data/data_sources/i_task_local_ds.dart';
+import 'package:grubpac/features/tasks/data/data_sources/i_task_remote_ds.dart';
+import 'package:grubpac/features/tasks/data/impl/task_local_ds_impl.dart';
+import 'package:grubpac/features/tasks/data/impl/task_remote_ds_impl.dart';
+import 'package:grubpac/features/tasks/data/impl/task_repo_impl.dart';
+import 'package:grubpac/features/tasks/domain/repo/i_task_repo.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/assign_task_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/create_task_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/delete_task_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/get_task_by_id_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/get_tasks_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/unassign_task_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/update_task_priority_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/update_task_status_use_case.dart';
+import 'package:grubpac/features/tasks/domain/use_cases/update_task_use_case.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -67,7 +82,42 @@ void _initAuth() {
   // );
 }
 
-void _initTasks() {}
+void _initTasks() {
+  serviceLocator.registerLazySingleton<ITaskLocalDs>(
+    () => TaskLocalDsImpl(databaseHelper: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton<ITaskRemoteDs>(TaskRemoteDsImpl.new);
+  serviceLocator.registerLazySingleton<ITaskRepo>(
+    () => TaskRepoImpl(remoteDs: serviceLocator(), localDs: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetTasksUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetTaskByIdUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => CreateTaskUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => UpdateTaskUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => DeleteTaskUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => UpdateTaskStatusUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => UpdateTaskPriorityUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => AssignTaskUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => UnassignTaskUseCase(repository: serviceLocator()),
+  );
+}
 
 void _initProjects() {
   serviceLocator.registerLazySingleton(DatabaseHelper.new);
