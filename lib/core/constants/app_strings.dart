@@ -41,4 +41,11 @@ abstract final class AppJsonKeys {
   static const String userId = 'user_id';
   static const String accessTokenExpiresAt = 'access_token_expires_at';
   static const String refreshTokenExpiresAt = 'refresh_token_expires_at';
+  static const String projects = 'projects';
+  static const String projectId = 'project_id';
+  static const String name = 'name';
+  static const String description = 'description';
+  static const String taskCount = 'task_count';
+  static const String status = 'status';
+  static const String createdAt = 'created_at';
 }
