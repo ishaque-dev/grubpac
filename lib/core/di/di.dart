@@ -1,8 +1,16 @@
 import 'package:get_it/get_it.dart';
+import 'package:grubpac/core/database/db.dart';
+import 'package:grubpac/features/projects/data/data_sources/i_projects_local_ds.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_remote_ds.dart';
+import 'package:grubpac/features/projects/data/impl/projects_local_ds_impl.dart';
 import 'package:grubpac/features/projects/data/impl/projects_remote_ds_impl.dart';
 import 'package:grubpac/features/projects/data/impl/projects_repo_impl.dart';
 import 'package:grubpac/features/projects/domain/repo/i_projects_repo.dart';
+import 'package:grubpac/features/projects/domain/use_cases/create_project_use_case.dart';
+import 'package:grubpac/features/projects/domain/use_cases/delete_project_use_case.dart';
+import 'package:grubpac/features/projects/domain/use_cases/get_project_by_id_use_case.dart';
+import 'package:grubpac/features/projects/domain/use_cases/get_projects_use_case.dart';
+import 'package:grubpac/features/projects/domain/use_cases/update_project_use_case.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -62,10 +70,30 @@ void _initAuth() {
 void _initTasks() {}
 
 void _initProjects() {
+  serviceLocator.registerLazySingleton(DatabaseHelper.new);
+  serviceLocator.registerLazySingleton<IProjectsLocalDs>(
+    () => ProjectsLocalDsImpl(databaseHelper: serviceLocator()),
+  );
   serviceLocator.registerLazySingleton<IProjectsRemoteDs>(
     ProjectsRemoteDsImpl.new,
   );
   serviceLocator.registerLazySingleton<IProjectsRepo>(
-    () => ProjectsRepoImpl(remoteDs: serviceLocator()),
+    () =>
+        ProjectsRepoImpl(remoteDs: serviceLocator(), localDs: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetProjectsUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetProjectByIdUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => CreateProjectUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => UpdateProjectUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => DeleteProjectUseCase(repository: serviceLocator()),
   );
 }
