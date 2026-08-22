@@ -12,6 +12,7 @@ import 'package:grubpac/features/auth/domain/use_cases/get_saved_session_use_cas
 import 'package:grubpac/features/auth/domain/use_cases/login_use_case.dart';
 import 'package:grubpac/features/auth/domain/use_cases/logout_use_case.dart';
 import 'package:grubpac/features/auth/domain/use_cases/refresh_session_use_case.dart';
+import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_local_ds.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_remote_ds.dart';
 import 'package:grubpac/features/projects/data/impl/projects_local_ds_impl.dart';
@@ -23,6 +24,7 @@ import 'package:grubpac/features/projects/domain/use_cases/delete_project_use_ca
 import 'package:grubpac/features/projects/domain/use_cases/get_project_by_id_use_case.dart';
 import 'package:grubpac/features/projects/domain/use_cases/get_projects_use_case.dart';
 import 'package:grubpac/features/projects/domain/use_cases/update_project_use_case.dart';
+import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 import 'package:grubpac/features/tasks/data/data_sources/i_task_local_ds.dart';
 import 'package:grubpac/features/tasks/data/data_sources/i_task_remote_ds.dart';
 import 'package:grubpac/features/tasks/data/impl/task_local_ds_impl.dart';
@@ -38,6 +40,7 @@ import 'package:grubpac/features/tasks/domain/use_cases/unassign_task_use_case.d
 import 'package:grubpac/features/tasks/domain/use_cases/update_task_priority_use_case.dart';
 import 'package:grubpac/features/tasks/domain/use_cases/update_task_status_use_case.dart';
 import 'package:grubpac/features/tasks/domain/use_cases/update_task_use_case.dart';
+import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -57,10 +60,7 @@ Future<void> initDependencies() async {
 void _initCore() {
   serviceLocator.registerLazySingleton(Dio.new);
   serviceLocator.registerLazySingleton(DatabaseHelper.new);
-  serviceLocator.registerLazySingleton(
-    () => const FlutterSecureStorage(
-    ),
-  );
+  serviceLocator.registerLazySingleton(() => const FlutterSecureStorage());
 }
 
 void _initAuth() {
@@ -72,10 +72,7 @@ void _initAuth() {
 
   // Repository
   serviceLocator.registerLazySingleton<IAuthRepo>(
-    () => AuthRepoImpl(
-      remoteDs: serviceLocator(),
-      localDs: serviceLocator(),
-    ),
+    () => AuthRepoImpl(remoteDs: serviceLocator(), localDs: serviceLocator()),
   );
 
   // Use Cases
@@ -90,6 +87,14 @@ void _initAuth() {
   );
   serviceLocator.registerLazySingleton(
     () => RefreshSessionUseCase(authRepo: serviceLocator()),
+  );
+  serviceLocator.registerFactory(
+    () => AuthBloc(
+      getSavedSession: serviceLocator(),
+      login: serviceLocator(),
+      logout: serviceLocator(),
+      refreshSession: serviceLocator(),
+    ),
   );
 }
 
@@ -128,6 +133,19 @@ void _initTasks() {
   serviceLocator.registerLazySingleton(
     () => UnassignTaskUseCase(repository: serviceLocator()),
   );
+  serviceLocator.registerFactory(
+    () => TaskBloc(
+      getTasks: serviceLocator(),
+      getTaskById: serviceLocator(),
+      createTask: serviceLocator(),
+      updateTask: serviceLocator(),
+      deleteTask: serviceLocator(),
+      updateTaskStatus: serviceLocator(),
+      updateTaskPriority: serviceLocator(),
+      assignTask: serviceLocator(),
+      unassignTask: serviceLocator(),
+    ),
+  );
 }
 
 void _initProjects() {
@@ -138,10 +156,8 @@ void _initProjects() {
     ProjectsRemoteDsImpl.new,
   );
   serviceLocator.registerLazySingleton<IProjectsRepo>(
-    () => ProjectsRepoImpl(
-      remoteDs: serviceLocator(),
-      localDs: serviceLocator(),
-    ),
+    () =>
+        ProjectsRepoImpl(remoteDs: serviceLocator(), localDs: serviceLocator()),
   );
   serviceLocator.registerLazySingleton(
     () => GetProjectsUseCase(repository: serviceLocator()),
@@ -157,5 +173,14 @@ void _initProjects() {
   );
   serviceLocator.registerLazySingleton(
     () => DeleteProjectUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerFactory(
+    () => ProjectsBloc(
+      getProjects: serviceLocator(),
+      getProjectById: serviceLocator(),
+      createProject: serviceLocator(),
+      updateProject: serviceLocator(),
+      deleteProject: serviceLocator(),
+    ),
   );
 }
