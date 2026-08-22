@@ -36,7 +36,8 @@ class _ProjectsPageState extends State<ProjectsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext 
+  context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('PROJECTS', style: AppText.display(size: 28.sp)),

@@ -22,7 +22,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
     required this._createProject,
     required this._updateProject,
     required this._deleteProject,
-  }) : super(ProjectsInitial()) {
+  })  : super(ProjectsInitial()) {
     on<ProjectsLoadRequested>(_onLoadRequested);
     on<ProjectLoadRequested>(_onProjectLoadRequested);
     on<ProjectCreateRequested>(_onCreateRequested);

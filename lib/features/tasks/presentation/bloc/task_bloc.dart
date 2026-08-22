@@ -30,7 +30,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     required this._updateTaskPriority,
     required this._assignTask,
     required this._unassignTask,
-  }) : super(TaskInitial()) {
+  })  : super(TaskInitial()) {
     on<TasksLoadRequested>(_onTasksLoadRequested);
     on<TaskLoadRequested>(_onTaskLoadRequested);
     on<TaskCreateRequested>(_onCreateRequested);

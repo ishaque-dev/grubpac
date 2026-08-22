@@ -41,10 +41,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold((failure) => emit(AuthFailure(failure.message)), (
       session,
     ) async {
-      if (session == null) {
+      if (session == null || session.isRefreshTokenExpired) {
         emit(AuthUnauthenticated());
-      } else if (session.isAccessTokenExpired &&
-          !session.isRefreshTokenExpired) {
+      } else if (session.isAccessTokenExpired) {
         await _refresh(emit);
       } else {
         _emitAuthenticated(session, emit);

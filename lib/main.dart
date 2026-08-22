@@ -28,8 +28,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _authBloc = serviceLocator<AuthBloc>()..add(AuthSessionRequested());
+    _authBloc = serviceLocator<AuthBloc>();
     _appRouter = AppRouter(authBloc: _authBloc);
+    _authBloc.add(AuthSessionRequested());
   }
 
   @override

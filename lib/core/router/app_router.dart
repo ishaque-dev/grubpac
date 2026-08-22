@@ -32,13 +32,19 @@ class AppRouter {
         GoRoute(
           path: '/projects',
           builder: (context, state) {
-            final authState = authBloc.state;
-            if (authState is! AuthAuthenticated) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return ProjectsPage(session: authState.session);
+            return BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, authState) {
+                if (authState is AuthInitial || authState is AuthLoading) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (authState is! AuthAuthenticated) {
+                  return const LoginPage();
+                }
+                return ProjectsPage(session: authState.session);
+              },
+            );
           },
           routes: [
             GoRoute(
