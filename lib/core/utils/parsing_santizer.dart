@@ -24,6 +24,12 @@ T sanitizeWithType<T>(dynamic value, {T? defaultValue}) {
           defaultValue ??
           DateTime.fromMillisecondsSinceEpoch(0) as T;
     }
+    if (T == (Map<String, dynamic>) && value is Map) {
+      return Map<String, dynamic>.from(value) as T;
+    }
+    if (T == (List<dynamic>) && value is List) {
+      return List<dynamic>.from(value) as T;
+    }
   } catch (_) {
     return defaultValue ?? _defaultValue<T>();
   }
@@ -37,7 +43,7 @@ T _defaultValue<T>() {
   if (T == num) return 0 as T;
   if (T == bool) return false as T;
   if (T == DateTime) return DateTime.fromMillisecondsSinceEpoch(0) as T;
-  throw UnsupportedError("No default value for type $T");
+  throw UnsupportedError('No default value for type $T');
 }
 
 bool _parseBool(dynamic value) {

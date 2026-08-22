@@ -15,3 +15,30 @@ abstract final class AppStrings {
   static const String durationRequired = 'Duration is required.';
   static const String validDuration = 'Enter a valid duration.';
 }
+
+abstract final class AppInternalStrings {
+  static const String sessionKey = 'user_session';
+  static const String mockDataAsset = 'assets/mock-data.json';
+  static const String noActiveSession = 'No active session found';
+}
+
+abstract final class AppJsonKeys {
+  static const String authMock = 'auth_mock';
+  static const String testCredentials = 'test_credentials';
+  static const String users = 'users';
+  static const String mockLoginResponse = 'mock_login_response';
+  static const String email = 'email';
+  static const String password = 'password';
+  static const String id = 'id';
+  static const String organizationId = 'org_id';
+  static const String role = 'role';
+  static const String accessToken = 'access_token';
+  static const String refreshToken = 'refresh_token';
+  static const String accessTokenExpiresInSeconds =
+      'access_token_expires_in_seconds';
+  static const String refreshTokenExpiresInSeconds =
+      'refresh_token_expires_in_seconds';
+  static const String userId = 'user_id';
+  static const String accessTokenExpiresAt = 'access_token_expires_at';
+  static const String refreshTokenExpiresAt = 'refresh_token_expires_at';
+}
