@@ -38,7 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await _getSavedSession(parameters: NoParam());
-    result.fold((failure) => emit(AuthFailure(failure.message)), (
+    await result.fold((failure) async => emit(AuthFailure(failure.message)), (
       session,
     ) async {
       if (session == null || session.isRefreshTokenExpired) {

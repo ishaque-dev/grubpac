@@ -54,4 +54,31 @@ class TaskEntity {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TaskEntity &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          projectId == other.projectId &&
+          title == other.title &&
+          description == other.description &&
+          status == other.status &&
+          priority == other.priority &&
+          assigneeId == other.assigneeId &&
+          dueDate == other.dueDate &&
+          createdAt == other.createdAt;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      projectId.hashCode ^
+      title.hashCode ^
+      description.hashCode ^
+      status.hashCode ^
+      priority.hashCode ^
+      assigneeId.hashCode ^
+      dueDate.hashCode ^
+      createdAt.hashCode;
 }

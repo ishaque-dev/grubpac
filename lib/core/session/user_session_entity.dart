@@ -25,4 +25,27 @@ class UserSessionEntity {
 
   bool get isRefreshTokenExpired =>
       DateTime.now().isAfter(refreshTokenExpiresAt);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserSessionEntity &&
+          runtimeType == other.runtimeType &&
+          userId == other.userId &&
+          organizationId == other.organizationId &&
+          role == other.role &&
+          accessToken == other.accessToken &&
+          refreshToken == other.refreshToken &&
+          accessTokenExpiresAt == other.accessTokenExpiresAt &&
+          refreshTokenExpiresAt == other.refreshTokenExpiresAt;
+
+  @override
+  int get hashCode =>
+      userId.hashCode ^
+      organizationId.hashCode ^
+      role.hashCode ^
+      accessToken.hashCode ^
+      refreshToken.hashCode ^
+      accessTokenExpiresAt.hashCode ^
+      refreshTokenExpiresAt.hashCode;
 }

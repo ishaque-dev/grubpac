@@ -39,6 +39,20 @@ class AppFailure extends Failure {
   final FailureType type;
   final int? statusCode;
   final Object? cause;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is AppFailure &&
+          runtimeType == other.runtimeType &&
+          type == other.type &&
+          statusCode == other.statusCode &&
+          cause == other.cause;
+
+  @override
+  int get hashCode =>
+      super.hashCode ^ type.hashCode ^ statusCode.hashCode ^ cause.hashCode;
 }
 
 final class DefaultFailure extends AppFailure {
