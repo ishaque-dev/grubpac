@@ -4,10 +4,18 @@ import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 
 class ProjectCard extends StatelessWidget {
-  const ProjectCard({super.key, required this.project, this.onTap});
+  const ProjectCard({
+    super.key,
+    required this.project,
+    this.onTap,
+    this.onEdit,
+    this.onDelete,
+  });
 
   final ProjectEntity project;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +37,32 @@ class ProjectCard extends StatelessWidget {
                       style: AppText.display(size: 20.sp),
                     ),
                   ),
-                  _StatusChip(status: project.status),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _StatusChip(status: project.status),
+                      if (onEdit != null || onDelete != null)
+                        PopupMenuButton<String>(
+                          tooltip: 'Project actions',
+                          onSelected: (value) {
+                            if (value == 'edit') onEdit?.call();
+                            if (value == 'delete') onDelete?.call();
+                          },
+                          itemBuilder: (context) => [
+                            if (onEdit != null)
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('EDIT PROJECT'),
+                              ),
+                            if (onDelete != null)
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('DELETE PROJECT'),
+                              ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ],
               ),
               SizedBox(height: 8.h),
@@ -42,16 +75,27 @@ class ProjectCard extends StatelessWidget {
               const Spacer(),
               Row(
                 children: [
-                  Icon(Icons.assignment_outlined, size: 14.sp, color: AppColors.lime),
+                  Icon(
+                    Icons.assignment_outlined,
+                    size: 14.sp,
+                    color: AppColors.lime,
+                  ),
                   SizedBox(width: 4.w),
                   Text(
                     '${project.taskCount} TASKS',
-                    style: AppText.mono(size: 11.sp, color: AppColors.lime, weight: FontWeight.w700),
+                    style: AppText.mono(
+                      size: 11.sp,
+                      color: AppColors.lime,
+                      weight: FontWeight.w700,
+                    ),
                   ),
                   const Spacer(),
                   Text(
                     'CREATED ${project.createdAt.day}/${project.createdAt.month}/${project.createdAt.year}',
-                    style: AppText.mono(size: 10.sp, color: AppColors.textFaint),
+                    style: AppText.mono(
+                      size: 10.sp,
+                      color: AppColors.textFaint,
+                    ),
                   ),
                 ],
               ),
@@ -70,7 +114,9 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = status.toLowerCase() == 'active' ? AppColors.lime : AppColors.textMuted;
+    final color = status.toLowerCase() == 'active'
+        ? AppColors.lime
+        : AppColors.textMuted;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
       decoration: BoxDecoration(

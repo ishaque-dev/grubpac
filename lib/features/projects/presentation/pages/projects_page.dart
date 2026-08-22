@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
+import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 import 'package:grubpac/features/projects/presentation/widgets/create_project_sheet.dart';
+import 'package:grubpac/features/projects/presentation/widgets/edit_project_sheet.dart';
 import 'package:grubpac/features/projects/presentation/widgets/project_card.dart';
 
 class ProjectsPage extends StatefulWidget {
@@ -35,9 +38,44 @@ class _ProjectsPageState extends State<ProjectsPage> {
     );
   }
 
+  void _showEditSheet(ProjectEntity project) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bg,
+      shape: const CutCornerBorder(cut: 20),
+      builder: (_) =>
+          EditProjectSheet(project: project, session: widget.session),
+    );
+  }
+
+  Future<void> _confirmDelete(ProjectEntity project) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('DELETE PROJECT?'),
+        content: Text('This will permanently delete ${project.name}.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCEL'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('DELETE'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      context.read<ProjectsBloc>().add(
+        ProjectDeleteRequested(projectId: project.id, session: widget.session),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext 
-  context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('PROJECTS', style: AppText.display(size: 28.sp)),
@@ -108,6 +146,12 @@ class _ProjectsPageState extends State<ProjectsPage> {
                 final project = projects[index];
                 return ProjectCard(
                   project: project,
+                  onEdit: widget.session.role == UserRole.orgAdmin
+                      ? () => _showEditSheet(project)
+                      : null,
+                  onDelete: widget.session.role == UserRole.orgAdmin
+                      ? () => _confirmDelete(project)
+                      : null,
                   onTap: () {
                     context.push(
                       '/projects/${project.id}/tasks',
