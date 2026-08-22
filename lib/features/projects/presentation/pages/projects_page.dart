@@ -40,6 +40,10 @@ class _ProjectsPageState extends State<ProjectsPage> {
   }
 
   void _showEditSheet(ProjectEntity project) {
+    if (widget.session.role != UserRole.orgAdmin) {
+      _showUnauthorizedMessage();
+      return;
+    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -51,6 +55,10 @@ class _ProjectsPageState extends State<ProjectsPage> {
   }
 
   Future<void> _confirmDelete(ProjectEntity project) async {
+    if (widget.session.role != UserRole.orgAdmin) {
+      _showUnauthorizedMessage();
+      return;
+    }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -78,6 +86,12 @@ class _ProjectsPageState extends State<ProjectsPage> {
         ProjectDeleteRequested(projectId: project.id, session: widget.session),
       );
     }
+  }
+
+  void _showUnauthorizedMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppUiStrings.projectAdminOnly)),
+    );
   }
 
   @override
@@ -152,12 +166,8 @@ class _ProjectsPageState extends State<ProjectsPage> {
                 final project = projects[index];
                 return ProjectCard(
                   project: project,
-                  onEdit: widget.session.role == UserRole.orgAdmin
-                      ? () => _showEditSheet(project)
-                      : null,
-                  onDelete: widget.session.role == UserRole.orgAdmin
-                      ? () => _confirmDelete(project)
-                      : null,
+                  onEdit: () => _showEditSheet(project),
+                  onDelete: () => _confirmDelete(project),
                   onTap: () {
                     context.push(
                       '/projects/${project.id}/tasks',

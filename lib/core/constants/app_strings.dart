@@ -62,6 +62,8 @@ abstract final class AppUiStrings {
   static const String signOut = 'Sign out';
   static const String projectActions = 'Project actions';
   static const String projectNotFound = 'Project not found';
+  static const String projectAdminOnly =
+      'Only organization admins can perform this action.';
 }
 
 abstract final class AppInternalStrings {
