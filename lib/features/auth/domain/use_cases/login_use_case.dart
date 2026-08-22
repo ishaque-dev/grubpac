@@ -8,7 +8,7 @@ import 'package:grubpac/features/auth/domain/repo/i_auth_repo.dart';
 class LoginUseCase implements UseCase<UserSessionEntity, AuthRequestEntity> {
   final IAuthRepo authRepo;
 
-  new({required this.authRepo});
+  LoginUseCase({required this.authRepo});
   @override
   Future<Either<Failure, UserSessionEntity>> call({
     required AuthRequestEntity parameters,

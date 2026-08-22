@@ -1,5 +1,17 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:grubpac/core/database/db.dart';
+import 'package:grubpac/features/auth/data/data_sources/i_auth_local_ds.dart';
+import 'package:grubpac/features/auth/data/data_sources/i_auth_remote_ds.dart';
+import 'package:grubpac/features/auth/data/impl/auth_local_ds_impl.dart';
+import 'package:grubpac/features/auth/data/impl/auth_remote_ds_impl.dart';
+import 'package:grubpac/features/auth/data/impl/auth_repo_impl.dart';
+import 'package:grubpac/features/auth/domain/repo/i_auth_repo.dart';
+import 'package:grubpac/features/auth/domain/use_cases/get_saved_session_use_case.dart';
+import 'package:grubpac/features/auth/domain/use_cases/login_use_case.dart';
+import 'package:grubpac/features/auth/domain/use_cases/logout_use_case.dart';
+import 'package:grubpac/features/auth/domain/use_cases/refresh_session_use_case.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_local_ds.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_remote_ds.dart';
 import 'package:grubpac/features/projects/data/impl/projects_local_ds_impl.dart';
@@ -30,6 +42,8 @@ import 'package:grubpac/features/tasks/domain/use_cases/update_task_use_case.dar
 final GetIt serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
+  _initCore();
+
   // Auth Feature
   _initAuth();
 
@@ -40,46 +54,43 @@ Future<void> initDependencies() async {
   _initProjects();
 }
 
+void _initCore() {
+  serviceLocator.registerLazySingleton(Dio.new);
+  serviceLocator.registerLazySingleton(DatabaseHelper.new);
+  serviceLocator.registerLazySingleton(
+    () => const FlutterSecureStorage(
+    ),
+  );
+}
+
 void _initAuth() {
   // Data Sources
-  // serviceLocator.registerLazySingleton<IAuthRemoteDs>(
-  //   () => AuthRemoteDsImpl(serviceLocator()),
-  // );
-  // serviceLocator.registerLazySingleton<IAuthLocalDs>(
-  //   () => AuthLocalDsImpl(serviceLocator()),
-  // );
+  serviceLocator.registerLazySingleton<IAuthRemoteDs>(AuthRemoteDsImpl.new);
+  serviceLocator.registerLazySingleton<IAuthLocalDs>(
+    () => AuthLocalDsImpl(secureStorage: serviceLocator()),
+  );
 
-  // // Repository
-  // serviceLocator.registerLazySingleton<IAuthRepo>(
-  //   () => AuthRepoImpl(
-  //     remoteDataSource: serviceLocator(),
-  //     localDataSource: serviceLocator(),
-  //   ),
-  // );
+  // Repository
+  serviceLocator.registerLazySingleton<IAuthRepo>(
+    () => AuthRepoImpl(
+      remoteDs: serviceLocator(),
+      localDs: serviceLocator(),
+    ),
+  );
 
-  // // Use Cases
-  // serviceLocator.registerLazySingleton(
-  //   () => LoginUseCase(authRepository: serviceLocator()),
-  // );
-  // serviceLocator.registerLazySingleton(
-  //   () => SignUpUseCase(authRepository: serviceLocator()),
-  // );
-  // serviceLocator.registerLazySingleton(
-  //   () => LogoutUseCase(authRepository: serviceLocator()),
-  // );
-  // serviceLocator.registerLazySingleton(
-  //   () => GetLoggedInUserUseCase(authRepository: serviceLocator()),
-  // );
-
-  // // Bloc
-  // serviceLocator.registerFactory(
-  //   () => AuthBloc(
-  //     loginUseCase: serviceLocator(),
-  //     signUpUseCase: serviceLocator(),
-  //     logoutUseCase: serviceLocator(),
-  //     getLoggedInUserUseCase: serviceLocator(),
-  //   ),
-  // );
+  // Use Cases
+  serviceLocator.registerLazySingleton(
+    () => LoginUseCase(authRepo: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => LogoutUseCase(authRepo: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetSavedSessionUseCase(authRepo: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => RefreshSessionUseCase(authRepo: serviceLocator()),
+  );
 }
 
 void _initTasks() {
@@ -120,7 +131,6 @@ void _initTasks() {
 }
 
 void _initProjects() {
-  serviceLocator.registerLazySingleton(DatabaseHelper.new);
   serviceLocator.registerLazySingleton<IProjectsLocalDs>(
     () => ProjectsLocalDsImpl(databaseHelper: serviceLocator()),
   );
@@ -128,8 +138,10 @@ void _initProjects() {
     ProjectsRemoteDsImpl.new,
   );
   serviceLocator.registerLazySingleton<IProjectsRepo>(
-    () =>
-        ProjectsRepoImpl(remoteDs: serviceLocator(), localDs: serviceLocator()),
+    () => ProjectsRepoImpl(
+      remoteDs: serviceLocator(),
+      localDs: serviceLocator(),
+    ),
   );
   serviceLocator.registerLazySingleton(
     () => GetProjectsUseCase(repository: serviceLocator()),
