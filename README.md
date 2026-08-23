@@ -110,6 +110,15 @@ The UI is built on a custom design system characterized by:
 
 ---
 
+## 📌 Implementation Notes & Non-Coverage
+
+To maintain a focused scope for this technical showcase, the following areas were intentionally left as future enhancements:
+- **Task Comments**: While the Data Layer models and schemas are prepared, the UI for task-level commenting is not included in this version.
+- **Member Assignment**: Tasks are created within a project context; a dedicated UI for individual member selection from the team list is a planned feature.
+- **Push Notifications**: Real-time notifications are simulated via an in-app alert center; integration with FCM/APNS for system-level push is not implemented.
+
+---
+
 ## 👨‍💻 Developer Details
 
 **Developed by Ishaque**  
