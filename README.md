@@ -23,7 +23,7 @@ graph TD
 
     subgraph Data [Data Layer - Infrastructure]
         RI -->|Implement| R[Repository Implementation]
-        R -->|Network| RDS[Remote Data Source - Dio]
+        R -->|Simulation| RDS[Remote Data Source - Mock]
         R -->|Database| LDS[Local Data Source - Sqflite]
         R -->|Auth| SS[Secure Storage - AES]
     end
@@ -47,7 +47,7 @@ TaskFlow ensures data integrity and availability even in zero-connectivity envir
 sequenceDiagram
     participant UI as Presentation
     participant Repo as Repository
-    participant Remote as Remote (Dio)
+    participant Remote as Remote (Simulation)
     participant Local as Local (Sqflite)
 
     UI->>Repo: Fetch Data
@@ -72,7 +72,7 @@ sequenceDiagram
 ### 📦 Core Packages Used
 - **State Management**: `flutter_bloc` — Unidirectional data flow and reactive UI updates.
 - **Dependency Injection**: `get_it` — Service locator for decoupled dependency management.
-- **Networking**: `dio` — High-performance HTTP client with interceptors and custom error mapping.
+- **Networking**: `dio` (Engine) — Pre-configured high-performance HTTP client for future API integration. Current remote logic uses an asynchronous mock simulation for evaluation reliability.
 - **Navigation**: `go_router` — Declarative, URL-based routing with deep-link and Auth-guard support.
 - **Persistence**: `sqflite` — Relational SQLite database for mission-critical offline data.
 - **Security**: `flutter_secure_storage` — AES-encrypted storage for sensitive session tokens.
@@ -81,7 +81,7 @@ sequenceDiagram
 
 ### ⚠️ Global Error Handling
 TaskFlow features a centralized Error Handling system:
-- **Failure Mapping**: Low-level exceptions (Socket, Dio, Format) are intercepted in the Data layer and mapped to high-level **Domain Failures**.
+- **Failure Mapping**: Simulated and system exceptions (Socket, Format) are intercepted in the Data layer and mapped to high-level **Domain Failures**.
 - **User-Centric Messages**: Every `Failure` includes a safe, human-readable message to ensure the user is never exposed to technical stack traces.
 - **Resilient UI**: The Presentation layer handles these failures gracefully, displaying themed SnackBars while retaining the previously loaded state.
 
