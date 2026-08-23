@@ -13,6 +13,15 @@ import 'package:grubpac/features/auth/domain/use_cases/login_use_case.dart';
 import 'package:grubpac/features/auth/domain/use_cases/logout_use_case.dart';
 import 'package:grubpac/features/auth/domain/use_cases/refresh_session_use_case.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grubpac/features/notifications/data/data_sources/i_notification_local_ds.dart';
+import 'package:grubpac/features/notifications/data/data_sources/i_notification_remote_ds.dart';
+import 'package:grubpac/features/notifications/data/impl/notification_local_ds_impl.dart';
+import 'package:grubpac/features/notifications/data/impl/notification_remote_ds_impl.dart';
+import 'package:grubpac/features/notifications/data/impl/notification_repo_impl.dart';
+import 'package:grubpac/features/notifications/domain/repo/i_notification_repo.dart';
+import 'package:grubpac/features/notifications/domain/use_cases/get_notifications_use_case.dart';
+import 'package:grubpac/features/notifications/domain/use_cases/toggle_notification_read_use_case.dart';
+import 'package:grubpac/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_local_ds.dart';
 import 'package:grubpac/features/projects/data/data_sources/i_projects_remote_ds.dart';
 import 'package:grubpac/features/projects/data/impl/projects_local_ds_impl.dart';
@@ -62,8 +71,38 @@ Future<void> initDependencies() async {
   // Team Feature
   _initTeam();
 
+  // Notifications Feature
+  _initNotifications();
+
   // Projects Feature
   _initProjects();
+}
+
+void _initNotifications() {
+  serviceLocator.registerLazySingleton<INotificationRemoteDs>(
+    NotificationRemoteDsImpl.new,
+  );
+  serviceLocator.registerLazySingleton<INotificationLocalDs>(
+    () => NotificationLocalDsImpl(databaseHelper: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton<INotificationRepo>(
+    () => NotificationRepoImpl(
+      remoteDs: serviceLocator(),
+      localDs: serviceLocator(),
+    ),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetNotificationsUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => ToggleNotificationReadUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerFactory(
+    () => NotificationBloc(
+      getNotifications: serviceLocator(),
+      toggleRead: serviceLocator(),
+    ),
+  );
 }
 
 void _initTeam() {

@@ -8,6 +8,7 @@ import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/core/widgets/app_snackbar.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grubpac/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 import 'package:grubpac/features/projects/presentation/widgets/create_project_sheet.dart';
@@ -28,6 +29,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
   void initState() {
     super.initState();
     context.read<ProjectsBloc>().add(ProjectsLoadRequested(widget.session));
+    context.read<NotificationBloc>().add(NotificationsLoadRequested(widget.session));
   }
 
   void _showCreateSheet() {
@@ -123,8 +125,36 @@ class _ProjectsPageState extends State<ProjectsPage> {
         title: Text(AppUiStrings.projects, style: AppText.display(size: 28.sp)),
         centerTitle: false,
         actions: [
+          BlocBuilder<NotificationBloc, NotificationState>(
+            builder: (context, state) {
+              final hasUnread = state is NotificationLoaded && state.notifications.any((n) => !n.hasRead);
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    tooltip: AppUiStrings.notifications,
+                    onPressed: () => context.push('/notifications'),
+                    icon: const Icon(Icons.notifications_outlined),
+                  ),
+                  if (hasUnread)
+                    Positioned(
+                      top: 12.h,
+                      right: 12.w,
+                      child: Container(
+                        width: 8.r,
+                        height: 8.r,
+                        decoration: const BoxDecoration(
+                          color: AppColors.lime,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
-            tooltip: 'TEAM',
+            tooltip: AppUiStrings.team,
             onPressed: () => context.push('/team'),
             icon: const Icon(Icons.people_outline),
           ),
@@ -200,14 +230,14 @@ class _ProjectsPageState extends State<ProjectsPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'HI, ${((widget.session.userName != null && widget.session.userName!.isNotEmpty) ? widget.session.userName! : "USER")}',
+                                  '${AppUiStrings.hi}${((widget.session.userName != null && widget.session.userName!.isNotEmpty) ? widget.session.userName!.toUpperCase() : AppUiStrings.user)}',
                                   style: AppText.display(
                                     size: 32.sp,
                                     color: AppColors.lime,
                                   ),
                                 ),
                                 Text(
-                                  'YOUR PROJECTS ARE READY.',
+                                  AppUiStrings.projectsReady,
                                   style: AppText.mono(
                                     size: 12.sp,
                                     color: AppColors.textMuted,

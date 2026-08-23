@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grubpac/core/constants/app_strings.dart';
+import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:grubpac/features/auth/presentation/pages/login_page.dart';
+import 'package:grubpac/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 import 'package:grubpac/features/projects/presentation/pages/projects_page.dart';
@@ -36,9 +38,27 @@ class AppRouter {
           builder: (context, state) {
             final authState = authBloc.state;
             if (authState is! AuthAuthenticated) {
-              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(color: AppColors.lime),
+                ),
+              );
             }
             return TeamPage(session: authState.session);
+          },
+        ),
+        GoRoute(
+          path: '/notifications',
+          builder: (context, state) {
+            final authState = authBloc.state;
+            if (authState is! AuthAuthenticated) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(color: AppColors.lime),
+                ),
+              );
+            }
+            return NotificationsPage(session: authState.session);
           },
         ),
         GoRoute(

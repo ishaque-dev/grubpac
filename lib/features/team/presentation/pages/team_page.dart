@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/team/presentation/bloc/team_bloc.dart';
@@ -25,7 +26,7 @@ class _TeamPageState extends State<TeamPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ORGANIZATION TEAM', style: AppText.display(size: 24.sp)),
+        title: Text(AppUiStrings.organizationTeam, style: AppText.display(size: 24.sp)),
         centerTitle: false,
       ),
       body: BlocBuilder<TeamBloc, TeamState>(

@@ -80,6 +80,16 @@ abstract final class AppUiStrings {
   static const String taskUnassigned = 'Task unassigned successfully.';
   static const String logoutQuestion = 'SIGN OUT?';
   static const String logoutWarning = 'Are you sure you want to sign out?';
+  static const String notifications = 'NOTIFICATIONS';
+  static const String allCaughtUp = 'ALL CAUGHT UP!';
+  static const String team = 'TEAM';
+  static const String organizationTeam = 'ORGANIZATION TEAM';
+  static const String hi = 'HI, ';
+  static const String user = 'USER';
+  static const String projectsReady = 'YOUR PROJECTS ARE READY.';
+  static const String markAsRead = 'MARK AS READ';
+  static const String markAsUnread = 'MARK AS UNREAD';
+  static const String markAllAsRead = 'MARK ALL AS READ';
 }
 
 abstract final class AppInternalStrings {
@@ -117,6 +127,9 @@ abstract final class AppJsonKeys {
   static const String status = 'status';
   static const String createdAt = 'created_at';
   static const String tasks = 'tasks';
+  static const String type = 'type';
+  static const String taskId = 'task_id';
+  static const String message = 'message';
   static const String title = 'title';
   static const String priority = 'priority';
   static const String assigneeId = 'assignee_id';

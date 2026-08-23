@@ -8,6 +8,7 @@ import 'package:grubpac/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
 import 'package:grubpac/features/team/presentation/bloc/team_bloc.dart';
+import 'package:grubpac/features/notifications/presentation/bloc/notification_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,7 @@ class _MyAppState extends State<MyApp> {
             BlocProvider(create: (context) => serviceLocator<ProjectsBloc>()),
             BlocProvider(create: (context) => serviceLocator<TaskBloc>()),
             BlocProvider(create: (context) => serviceLocator<TeamBloc>()),
+            BlocProvider(create: (context) => serviceLocator<NotificationBloc>()),
           ],
           child: MaterialApp.router(
             title: 'TaskFlow',
