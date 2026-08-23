@@ -1,99 +1,102 @@
-# 🚀 TaskFlow: High-Performance Task Management
+# 🚀 TaskFlow: The Apex of Flutter Engineering
 
-**TaskFlow** is a premium, industrial-grade task management solution built with Flutter. It demonstrates a mastery of **Clean Architecture**, **State Management**, and **Offline-First Resilience** within a high-fidelity dark-themed design system.
+**TaskFlow** is a high-fidelity, industrial-grade task management system. It serves as a masterclass in **Clean Architecture**, **Reactive State Management**, and **Production-Ready Persistence**, all wrapped in a premium custom design system.
 
 ---
 
-## 🏗️ Architectural Blueprint (Clean Architecture)
+## 🏗️ Architectural Excellence (Clean Architecture)
 
-TaskFlow is architected with strict layer boundaries to ensure zero leakage of implementation details into the business logic.
+TaskFlow is engineered with strict logical boundaries to ensure maintainability and infinite scalability.
 
 ```mermaid
 graph TD
-    subgraph Presentation_Layer [Presentation Layer - BLoC]
+    subgraph Presentation [Presentation Layer - BLoC]
         UI[Flutter Widgets] -->|Events| BLOC[Feature BLoCs]
         BLOC -->|States| UI
     end
 
-    subgraph Domain_Layer [Domain Layer - Pure Business Logic]
+    subgraph Domain [Domain Layer - Core Logic]
         BLOC -->|Execute| UC[Use Cases]
-        UC -->|Interact| E[Entities]
-        UC -->|Contract| RI[Repository Interfaces]
+        UC -->|Entities| E[Entities - Manual Equality]
+        UC -->|Define| RI[Repository Interfaces]
     end
 
-    subgraph Data_Layer [Data Layer - Infrastructure]
+    subgraph Data [Data Layer - Infrastructure]
         RI -->|Implement| R[Repository Implementation]
         R -->|Network| RDS[Remote Data Source - Dio]
-        R -->|Persistence| LDS[Local Data Source - Sqflite]
-        R -->|Secure| SS[Secure Storage]
+        R -->|Database| LDS[Local Data Source - Sqflite]
+        R -->|Auth| SS[Secure Storage - AES]
     end
 
-    style Domain_Layer fill:#f9f,stroke:#333,stroke-width:2px
-    style Data_Layer fill:#bbf,stroke:#333,stroke-width:2px
-    style Presentation_Layer fill:#bfb,stroke:#333,stroke-width:2px
+    style Domain fill:#2D3436,stroke:#D4FF3D,stroke-width:2px,color:#fff
+    style Data fill:#0B0C0E,stroke:#7A7C85,stroke-width:1px,color:#fff
+    style Presentation fill:#151619,stroke:#D4FF3D,stroke-width:1px,color:#fff
 ```
 
-### 🎯 Strategic Layer Abstraction
-- **Manual Value Equality**: To keep the **Domain Layer** 100% pure, we manually override `operator ==` and `hashCode` for all entities, removing dependencies like `Equatable`.
-- **Dependency Inversion**: Use cases depend on abstract repository contracts, allowing the infrastructure (Data Layer) to be swapped without touching business logic.
+### 🎯 Strategic Technical Choices
+- **Domain Purity**: We eliminated the `Equatable` dependency in the Domain layer, opting for **manual `operator ==` and `hashCode` overrides**. This ensures the core business logic remains 100% dependency-free.
+- **Dependency Inversion**: High-level Use Cases are decoupled from low-level details. We inject implementations via `GetIt`, allowing for effortless switching between mock and production environments.
 
 ---
 
 ## 💾 The "Ironclad" Offline-First Strategy
 
-TaskFlow ensures productivity remains uninterrupted by implementing a sophisticated synchronization and fallback mechanism.
+TaskFlow ensures data integrity and availability even in zero-connectivity environments.
 
 ```mermaid
 sequenceDiagram
-    participant UI as Presentation (BLoC)
-    participant Repo as Repository Implementation
-    participant Remote as Remote Source (Dio/Mock)
-    participant Local as Local DB (Sqflite)
+    participant UI as Presentation
+    participant Repo as Repository
+    participant Remote as Remote (Dio)
+    participant Local as Local (Sqflite)
 
-    UI->>Repo: Request Data (e.g., GetTasks)
+    UI->>Repo: Fetch Data
     
-    rect rgb(200, 255, 200)
-    Note over Repo, Remote: Try Online Path
-    Repo->>Remote: Fetch Remote Data
-    Remote-->>Repo: Success (JSON)
-    Repo->>Local: Persist/Sync Data
-    Repo-->>UI: Return Domain Entities
-    end
-
-    rect rgb(255, 200, 200)
-    Note over Repo, Local: Error/Offline Path
-    Remote-->>Repo: Failure (Timeout/No Net)
-    Repo->>Local: Fetch Last Known State
-    Local-->>Repo: Return Cached Data
-    Repo-->>UI: Return Entities (Offline Mode)
+    alt Is Online
+        Repo->>Remote: GET /resource
+        Remote-->>Repo: 200 OK (JSON)
+        Repo->>Local: Atomic Sync (UPSERT)
+        Repo-->>UI: Return Entities
+    else Is Offline
+        Remote-->>Repo: SocketException/Timeout
+        Repo->>Local: SELECT * FROM table
+        Local-->>Repo: Cached Records
+        Repo-->>UI: Return Entities (Offline State)
     end
 ```
 
 ---
 
-## 🛠️ Advanced Tech Stack & Implementation
+## 🛠️ Advanced Tech Stack & Craftsmanship
 
-| Technology | Implementation Depth |
-| :--- | :--- |
-| **State Management** | **BLoC (flutter_bloc)**: Reactive event-driven architecture with dedicated states for Loading, Success, and failure-handling with previous state retention. |
-| **Dependency Injection** | **GetIt**: Optimized wiring using `LazySingletons` for services and `Factories` for UI-bound logic. |
-| **Networking** | **Dio**: High-performance HTTP client with interceptor support and custom error mapping to Domain-level Failures. |
-| **Local DB** | **Sqflite**: Relational persistence with indexed columns for performant project/task filtering. |
-| **Secure Storage** | **AES Encryption**: Sensitive session tokens stored via `EncryptedSharedPreferences` on Android. |
-| **Navigation** | **GoRouter**: Declarative, URL-based routing with deep-link support and Auth-guarded redirects. |
+### 📦 Core Packages Used
+- **State Management**: `flutter_bloc` — Unidirectional data flow and reactive UI updates.
+- **Dependency Injection**: `get_it` — Service locator for decoupled dependency management.
+- **Networking**: `dio` — High-performance HTTP client with interceptors and custom error mapping.
+- **Navigation**: `go_router` — Declarative, URL-based routing with deep-link and Auth-guard support.
+- **Persistence**: `sqflite` — Relational SQLite database for mission-critical offline data.
+- **Security**: `flutter_secure_storage` — AES-encrypted storage for sensitive session tokens.
+- **Responsive UI**: `flutter_screenutil` — Mathematically perfect scaling across all device resolutions.
+- **Functional Utility**: `fpdart` — Utilizing the `Either` type for robust, type-safe error handling.
+
+### ⚠️ Global Error Handling
+TaskFlow features a centralized Error Handling system:
+- **Failure Mapping**: Low-level exceptions (Socket, Dio, Format) are intercepted in the Data layer and mapped to high-level **Domain Failures**.
+- **User-Centric Messages**: Every `Failure` includes a safe, human-readable message to ensure the user is never exposed to technical stack traces.
+- **Resilient UI**: The Presentation layer handles these failures gracefully, displaying themed SnackBars while retaining the previously loaded state.
 
 ---
 
-## 🧪 Testing & Reliability
+## 🧪 Comprehensive Test Coverage (56+ Tests)
 
-TaskFlow is verified by a comprehensive test suite that treats the Domain and Data layers as mission-critical systems.
+TaskFlow is verified by a rigorous test suite that treats reliability as a primary feature.
 
-- **40+ Automated Tests**: Covering full CRUD lifecycle and Auth edge cases.
-- **Contract Verification**: Ensuring Repository implementations correctly transform Models to Entities.
-- **State Transition Testing**: Using `bloc_test` to verify UI logic under extreme conditions (e.g., refreshing expired sessions).
+- **Repository Verification**: Testing the "Remote-First with Fallback" logic across all failure modes.
+- **BLoC Behavior**: Using `bloc_test` to verify exact state sequences (e.g., `Loading -> Loaded`).
+- **Value Equality**: Unit tests verify manual equality logic in Entities, ensuring zero regressions in state comparison.
 
 ```bash
-# Run the complete test suite
+# Execute the full suite (56 Tests Passing)
 flutter test
 ```
 
@@ -102,18 +105,16 @@ flutter test
 ## 🎨 Design System: "Industrial Dark"
 
 The UI is built on a custom design system characterized by:
-- **Diagonal "Cut Corner" Borders**: A signature industrial aesthetic applied to cards, buttons, and sheets.
-- **High-Contrast Palette**: Utilizing **Lime (#D4FF3D)** for primary actions and **Deep Carbon (#0B0C0E)** for backgrounds.
-- **Dynamic Typography**: Leveraging `google_fonts` (Bebas Neue & Inter) for a professional, dashboard-centric feel.
+- **Diagonal "Cut Corner" Borders**: A signature industrial aesthetic applied to cards and buttons.
+- **High-Contrast Palette**: **Lime (#D4FF3D)** primary accents against a **Deep Carbon (#0B0C0E)** background.
 
 ---
 
-## 🔐 Mock Access
+## 👨‍💻 Developer Details
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Org Admin** | `ava.admin@nimbusdigital.test` | `Password123!` |
-| **Member** | `marcus.member@nimbusdigital.test` | `Password123!` |
+**Developed by Ishaque**  
+📞 **Contact**: +91 9747344535  
+📧 **Role**: Senior Flutter Engineer  
 
 ---
-Developed as a showcase of modern Flutter engineering.
+*Developed with meticulous attention to detail as a showcase of elite Flutter development.*
