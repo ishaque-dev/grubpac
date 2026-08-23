@@ -10,6 +10,7 @@ import 'package:grubpac/features/projects/domain/entities/project_entity.dart';
 import 'package:grubpac/features/projects/presentation/bloc/projects_bloc.dart';
 import 'package:grubpac/features/projects/presentation/pages/projects_page.dart';
 import 'package:grubpac/features/tasks/presentation/pages/tasks_page.dart';
+import 'package:grubpac/features/team/presentation/pages/team_page.dart';
 
 class AppRouter {
   AppRouter({required AuthBloc authBloc})
@@ -30,6 +31,16 @@ class AppRouter {
       },
       routes: [
         GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+        GoRoute(
+          path: '/team',
+          builder: (context, state) {
+            final authState = authBloc.state;
+            if (authState is! AuthAuthenticated) {
+              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+            }
+            return TeamPage(session: authState.session);
+          },
+        ),
         GoRoute(
           path: '/projects',
           builder: (context, state) {

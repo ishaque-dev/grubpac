@@ -46,6 +46,7 @@ import 'package:grubpac/features/team/data/impl/team_remote_ds_impl.dart';
 import 'package:grubpac/features/team/data/impl/team_repo_impl.dart';
 import 'package:grubpac/features/team/domain/repo/i_team_repo.dart';
 import 'package:grubpac/features/team/domain/use_cases/get_members_use_case.dart';
+import 'package:grubpac/features/team/presentation/bloc/team_bloc.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -72,6 +73,9 @@ void _initTeam() {
   );
   serviceLocator.registerLazySingleton(
     () => GetMembersUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerFactory(
+    () => TeamBloc(getMembers: serviceLocator()),
   );
 }
 

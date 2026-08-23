@@ -124,6 +124,11 @@ class _ProjectsPageState extends State<ProjectsPage> {
         centerTitle: false,
         actions: [
           IconButton(
+            tooltip: 'TEAM',
+            onPressed: () => context.push('/team'),
+            icon: const Icon(Icons.people_outline),
+          ),
+          IconButton(
             tooltip: AppUiStrings.signOut,
             onPressed: _confirmLogout,
             icon: const Icon(Icons.logout),
@@ -183,28 +188,111 @@ class _ProjectsPageState extends State<ProjectsPage> {
                   ProjectsLoadRequested(widget.session),
                 );
               },
-              child: GridView.builder(
-                padding: EdgeInsets.all(24.w),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  mainAxisExtent: 160.h,
-                  mainAxisSpacing: 16.h,
-                ),
-                itemCount: projects.length,
-                itemBuilder: (context, index) {
-                  final project = projects[index];
-                  return ProjectCard(
-                    project: project,
-                    onEdit: () => _showEditSheet(project),
-                    onDelete: () => _confirmDelete(project),
-                    onTap: () {
-                      context.push(
-                        '/projects/${project.id}/tasks',
-                        extra: project,
-                      );
-                    },
-                  );
-                },
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'HI, ${((widget.session.userName != null && widget.session.userName!.isNotEmpty) ? widget.session.userName! : "USER")}',
+                                  style: AppText.display(
+                                    size: 32.sp,
+                                    color: AppColors.lime,
+                                  ),
+                                ),
+                                Text(
+                                  'YOUR PROJECTS ARE READY.',
+                                  style: AppText.mono(
+                                    size: 12.sp,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          widget.session.avatarUrl != null &&
+                                  widget.session.avatarUrl!.isNotEmpty
+                              ? Container(
+                                  padding: EdgeInsets.all(2.w),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.lime,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 24.r,
+                                    backgroundColor: AppColors.line,
+                                    backgroundImage: NetworkImage(
+                                      widget.session.avatarUrl!,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(2.w),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.lime,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 24.r,
+                                    backgroundColor: AppColors.line,
+                                    child: Text(
+                                      style: AppText.display(
+                                        color: AppColors.lime,
+                                      ),
+                                      ((widget.session.userName != null &&
+                                              widget
+                                                  .session
+                                                  .userName!
+                                                  .isNotEmpty)
+                                          ? widget.session.userName!
+                                          : "U"),
+                                    ),
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 16.h,
+                    ),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        mainAxisExtent: 160.h,
+                        mainAxisSpacing: 16.h,
+                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final project = projects[index];
+                        return ProjectCard(
+                          project: project,
+                          onEdit: () => _showEditSheet(project),
+                          onDelete: () => _confirmDelete(project),
+                          onTap: () {
+                            context.push(
+                              '/projects/${project.id}/tasks',
+                              extra: project,
+                            );
+                          },
+                        );
+                      }, childCount: projects.length),
+                    ),
+                  ),
+                ],
               ),
             );
           },

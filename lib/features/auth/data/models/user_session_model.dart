@@ -6,6 +6,8 @@ import 'package:grubpac/core/utils/parsing_santizer.dart';
 
 class UserSessionModel extends Equatable {
   final String userId;
+  final String? userName;
+  final String? avatarUrl;
   final String organizationId;
   final UserRole role;
   final String accessToken;
@@ -15,6 +17,8 @@ class UserSessionModel extends Equatable {
 
   const UserSessionModel({
     required this.userId,
+    this.userName,
+    this.avatarUrl,
     required this.organizationId,
     required this.role,
     required this.accessToken,
@@ -26,6 +30,8 @@ class UserSessionModel extends Equatable {
   factory UserSessionModel.fromJson(Map<String, dynamic> json) {
     return UserSessionModel(
       userId: sanitizeWithType<String>(json[AppJsonKeys.userId]),
+      userName: sanitizeWithType<String>(json[AppJsonKeys.name]),
+      avatarUrl: sanitizeWithType<String>(json['avatar_url']),
       organizationId: sanitizeWithType<String>(
         json[AppJsonKeys.organizationId],
       ),
@@ -48,6 +54,8 @@ class UserSessionModel extends Equatable {
   factory UserSessionModel.fromEntity(UserSessionEntity entity) {
     return UserSessionModel(
       userId: entity.userId,
+      userName: entity.userName,
+      avatarUrl: entity.avatarUrl,
       organizationId: entity.organizationId,
       role: entity.role,
       accessToken: entity.accessToken,
@@ -60,6 +68,8 @@ class UserSessionModel extends Equatable {
   UserSessionEntity toEntity() {
     return UserSessionEntity(
       userId: userId,
+      userName: userName,
+      avatarUrl: avatarUrl,
       organizationId: organizationId,
       role: role,
       accessToken: accessToken,
@@ -72,6 +82,8 @@ class UserSessionModel extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       AppJsonKeys.userId: userId,
+      AppJsonKeys.name: userName,
+      'avatar_url': avatarUrl,
       AppJsonKeys.organizationId: organizationId,
       AppJsonKeys.role: role.name,
       AppJsonKeys.accessToken: accessToken,
@@ -84,6 +96,8 @@ class UserSessionModel extends Equatable {
 
   UserSessionModel copyWith({
     String? userId,
+    String? userName,
+    String? avatarUrl,
     String? organizationId,
     UserRole? role,
     String? accessToken,
@@ -93,6 +107,8 @@ class UserSessionModel extends Equatable {
   }) {
     return UserSessionModel(
       userId: userId ?? this.userId,
+      userName: userName ?? this.userName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       organizationId: organizationId ?? this.organizationId,
       role: role ?? this.role,
       accessToken: accessToken ?? this.accessToken,
@@ -106,6 +122,8 @@ class UserSessionModel extends Equatable {
   @override
   List<Object?> get props => [
     userId,
+    userName,
+    avatarUrl,
     organizationId,
     role,
     accessToken,

@@ -51,6 +51,8 @@ class AuthRemoteDsImpl implements IAuthRemoteDs {
 
     return UserSessionModel(
       userId: sanitizeWithType<String>(matchingUser[AppJsonKeys.id]),
+      userName: sanitizeWithType<String>(matchingUser[AppJsonKeys.name]),
+      avatarUrl: sanitizeWithType<String>(matchingUser['avatar_url']),
       organizationId: sanitizeWithType<String>(
         matchingCredential[AppJsonKeys.organizationId],
       ),
