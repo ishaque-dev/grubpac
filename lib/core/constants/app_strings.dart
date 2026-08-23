@@ -45,10 +45,13 @@ abstract final class AppUiStrings {
   static const String projectDeleteWarning =
       'This will permanently delete {name}.';
   static const String newTask = 'NEW TASK';
+  static const String editTask = 'EDIT TASK';
   static const String taskTitle = 'TASK TITLE';
   static const String description = 'DESCRIPTION';
   static const String status = 'STATUS';
   static const String priority = 'PRIORITY';
+  static const String assignee = 'ASSIGNEE';
+  static const String unassigned = 'UNASSIGNED';
   static const String dueDate = 'DUE DATE';
   static const String createProject = 'CREATE PROJECT';
   static const String saveChanges = 'SAVE CHANGES';
@@ -89,8 +92,10 @@ abstract final class AppJsonKeys {
   static const String authMock = 'auth_mock';
   static const String testCredentials = 'test_credentials';
   static const String users = 'users';
+  static const String orgMembers = 'org_members';
   static const String mockLoginResponse = 'mock_login_response';
   static const String email = 'email';
+  static const String avatarUrl = 'avatar_url';
   static const String password = 'password';
   static const String id = 'id';
   static const String organizationId = 'org_id';

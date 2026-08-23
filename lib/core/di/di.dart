@@ -41,6 +41,11 @@ import 'package:grubpac/features/tasks/domain/use_cases/update_task_priority_use
 import 'package:grubpac/features/tasks/domain/use_cases/update_task_status_use_case.dart';
 import 'package:grubpac/features/tasks/domain/use_cases/update_task_use_case.dart';
 import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
+import 'package:grubpac/features/team/data/data_sources/i_team_remote_ds.dart';
+import 'package:grubpac/features/team/data/impl/team_remote_ds_impl.dart';
+import 'package:grubpac/features/team/data/impl/team_repo_impl.dart';
+import 'package:grubpac/features/team/domain/repo/i_team_repo.dart';
+import 'package:grubpac/features/team/domain/use_cases/get_members_use_case.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -53,8 +58,21 @@ Future<void> initDependencies() async {
   // Tasks Feature
   _initTasks();
 
+  // Team Feature
+  _initTeam();
+
   // Projects Feature
   _initProjects();
+}
+
+void _initTeam() {
+  serviceLocator.registerLazySingleton<ITeamRemoteDs>(TeamRemoteDsImpl.new);
+  serviceLocator.registerLazySingleton<ITeamRepo>(
+    () => TeamRepoImpl(remoteDs: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => GetMembersUseCase(repository: serviceLocator()),
+  );
 }
 
 void _initCore() {

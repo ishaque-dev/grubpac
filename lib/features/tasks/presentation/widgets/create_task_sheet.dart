@@ -8,16 +8,21 @@ import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/core/utils/app_validators.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
 import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
+import 'package:grubpac/features/team/domain/entities/member_entity.dart';
 
 class CreateTaskSheet extends StatefulWidget {
   const CreateTaskSheet({
     super.key,
     required this.projectId,
     required this.session,
+    required this.members,
+    this.initialTask,
   });
 
   final String projectId;
   final UserSessionEntity session;
+  final List<MemberEntity> members;
+  final TaskEntity? initialTask;
 
   @override
   State<CreateTaskSheet> createState() => _CreateTaskSheetState();
@@ -31,6 +36,22 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
   TaskStatus _status = TaskStatus.todo;
   TaskPriority _priority = TaskPriority.medium;
   DateTime _dueDate = DateTime.now().add(const Duration(days: 1));
+  String? _assigneeId;
+
+  bool get _isEditing => widget.initialTask != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final task = widget.initialTask;
+    if (task == null) return;
+    _titleController.text = task.title;
+    _descController.text = task.description;
+    _status = task.status;
+    _priority = task.priority;
+    _dueDate = task.dueDate;
+    _assigneeId = task.assigneeId;
+  }
 
   @override
   void dispose() {
@@ -68,13 +89,15 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
       context.read<TaskBloc>().add(
         TaskCreateRequested(
           task: TaskEntity(
+            id: widget.initialTask?.id,
             projectId: widget.projectId,
             title: _titleController.text.trim(),
             description: _descController.text.trim(),
             status: _status,
             priority: _priority,
             dueDate: _dueDate,
-            createdAt: DateTime.now(),
+            createdAt: widget.initialTask?.createdAt ?? DateTime.now(),
+            assigneeId: _assigneeId,
           ),
           session: widget.session,
         ),
@@ -99,7 +122,10 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppUiStrings.newTask, style: AppText.display(size: 24.sp)),
+              Text(
+                _isEditing ? AppUiStrings.editTask : AppUiStrings.newTask,
+                style: AppText.display(size: 24.sp),
+              ),
               SizedBox(height: 24.h),
               TextFormField(
                 controller: _titleController,
@@ -142,6 +168,14 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                 ],
               ),
               SizedBox(height: 16.h),
+              _MemberDropdown(
+                members: widget.members,
+                value: _assigneeId,
+                onChanged: (value) => setState(
+                  () => _assigneeId = value == _unassignedValue ? null : value,
+                ),
+              ),
+              SizedBox(height: 16.h),
               InkWell(
                 onTap: _selectDate,
                 child: Container(
@@ -173,7 +207,11 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _onSubmit,
-                  child: const Text(AppUiStrings.createTask),
+                  child: Text(
+                    _isEditing
+                        ? AppUiStrings.saveChanges
+                        : AppUiStrings.createTask,
+                  ),
                 ),
               ),
               SizedBox(height: 24.h),
@@ -181,6 +219,55 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
           ),
         ),
       ),
+    );
+  }
+}
+
+const _unassignedValue = '__unassigned__';
+
+class _MemberDropdown extends StatelessWidget {
+  const _MemberDropdown({
+    required this.members,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final List<MemberEntity> members;
+  final String? value;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppUiStrings.assignee,
+          style: AppText.mono(size: 10.sp, color: AppColors.textFaint),
+        ),
+        SizedBox(height: 4.h),
+        DropdownButtonFormField<String>(
+          initialValue: value ?? _unassignedValue,
+          items: [
+            const DropdownMenuItem(
+              value: _unassignedValue,
+              child: Text(AppUiStrings.unassigned),
+            ),
+            ...members.map(
+              (member) => DropdownMenuItem(
+                value: member.id,
+                child: Text(member.name, style: AppText.body(size: 12.sp)),
+              ),
+            ),
+          ],
+          onChanged: onChanged,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 12),
+          ),
+          dropdownColor: AppColors.card,
+          icon: const Icon(Icons.arrow_drop_down, color: AppColors.lime),
+        ),
+      ],
     );
   }
 }

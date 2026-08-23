@@ -4,17 +4,22 @@ import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
+import 'package:grubpac/features/team/domain/entities/member_entity.dart';
 
 class TaskCard extends StatelessWidget {
   const TaskCard({
     super.key,
     required this.task,
+    this.assignee,
+    this.onEdit,
     this.onStatusTap,
     this.onPriorityTap,
     this.onDelete,
   });
 
   final TaskEntity task;
+  final MemberEntity? assignee;
+  final VoidCallback? onEdit;
   final VoidCallback? onStatusTap;
   final VoidCallback? onPriorityTap;
   final VoidCallback? onDelete;
@@ -36,6 +41,14 @@ class TaskCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
+                  tooltip: AppUiStrings.edit,
+                  onPressed: onEdit,
+                  icon: Icon(Icons.edit_outlined, size: 18.sp),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                SizedBox(width: 12.w),
+                IconButton(
                   tooltip: AppUiStrings.deleteTask,
                   onPressed: onDelete,
                   icon: Icon(
@@ -56,6 +69,29 @@ class TaskCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 16.h),
+            if (assignee != null)
+              Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 14.r,
+                      backgroundColor: AppColors.line,
+                      backgroundImage: assignee!.avatarUrl == null
+                          ? null
+                          : NetworkImage(assignee!.avatarUrl!),
+                      child: assignee!.avatarUrl == null
+                          ? Text(
+                              assignee!.name.substring(0, 1).toUpperCase(),
+                              style: AppText.mono(size: 11.sp),
+                            )
+                          : null,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(assignee!.name, style: AppText.body(size: 12.sp)),
+                  ],
+                ),
+              ),
             Row(
               children: [
                 _ActionChip(

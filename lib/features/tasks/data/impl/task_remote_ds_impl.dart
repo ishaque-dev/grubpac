@@ -117,16 +117,7 @@ class TaskRemoteDsImpl implements ITaskRemoteDs {
     required UserSessionModel session,
   }) async {
     final task = await getTaskById(taskId: taskId, session: session);
-    final updated = TaskModel(
-      id: task.id,
-      projectId: task.projectId,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.dueDate,
-      createdAt: task.createdAt,
-    );
+    final updated = task.copyWith(clearAssignee: true);
     return updateTask(request: updated, session: session);
   }
 

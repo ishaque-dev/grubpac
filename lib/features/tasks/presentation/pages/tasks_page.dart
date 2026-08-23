@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:grubpac/core/constants/app_strings.dart';
+import 'package:grubpac/core/di/di.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/core/theme/app_theme.dart';
@@ -11,6 +12,8 @@ import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
 import 'package:grubpac/features/tasks/presentation/bloc/task_bloc.dart';
 import 'package:grubpac/features/tasks/presentation/widgets/create_task_sheet.dart';
 import 'package:grubpac/features/tasks/presentation/widgets/task_card.dart';
+import 'package:grubpac/features/team/domain/entities/member_entity.dart';
+import 'package:grubpac/features/team/domain/use_cases/get_members_use_case.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key, required this.project, required this.session});
@@ -25,6 +28,7 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late Future<List<MemberEntity>> _membersFuture;
 
   @override
   void initState() {
@@ -33,9 +37,17 @@ class _TasksPageState extends State<TasksPage>
       length: TaskStatus.values.length + 1,
       vsync: this,
     );
+    _membersFuture = _loadMembers();
     context.read<TaskBloc>().add(
       TasksLoadRequested(projectId: widget.project.id, session: widget.session),
     );
+  }
+
+  Future<List<MemberEntity>> _loadMembers() async {
+    final result = await serviceLocator<GetMembersUseCase>()(
+      parameters: widget.session,
+    );
+    return result.fold((_) => const <MemberEntity>[], (members) => members);
   }
 
   @override
@@ -50,9 +62,13 @@ class _TasksPageState extends State<TasksPage>
       isScrollControlled: true,
       backgroundColor: AppColors.bg,
       shape: const CutCornerBorder(cut: 20),
-      builder: (_) => CreateTaskSheet(
-        projectId: widget.project.id,
-        session: widget.session,
+      builder: (_) => FutureBuilder<List<MemberEntity>>(
+        future: _membersFuture,
+        builder: (context, snapshot) => CreateTaskSheet(
+          projectId: widget.project.id,
+          session: widget.session,
+          members: snapshot.data ?? const <MemberEntity>[],
+        ),
       ),
     );
   }
@@ -119,43 +135,50 @@ class _TasksPageState extends State<TasksPage>
             AppSnackbar.showSuccess(context, state.message!);
           }
         },
-        child: BlocBuilder<TaskBloc, TaskState>(
-          builder: (context, state) {
-            if (state is TaskLoading && state is! TaskLoaded) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
-              );
-            }
+        child: FutureBuilder<List<MemberEntity>>(
+          future: _membersFuture,
+          builder: (context, membersSnapshot) =>
+              BlocBuilder<TaskBloc, TaskState>(
+                builder: (context, state) {
+                  if (state is TaskLoading && state is! TaskLoaded) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: AppColors.lime),
+                    );
+                  }
 
-            final allTasks = state is TaskLoaded
-                ? state.tasks
-                : state is TaskFailure
-                ? state.tasks
-                : const <TaskEntity>[];
+                  final allTasks = state is TaskLoaded
+                      ? state.tasks
+                      : state is TaskFailure
+                      ? state.tasks
+                      : const <TaskEntity>[];
 
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                _TaskList(
-                  tasks: allTasks,
-                  onStatusTap: _updateStatus,
-                  onPriorityTap: _updatePriority,
-                  session: widget.session,
-                ),
-                ...TaskStatus.values.map((status) {
-                  final filtered = allTasks
-                      .where((t) => t.status == status)
-                      .toList();
-                  return _TaskList(
-                    tasks: filtered,
-                    onStatusTap: _updateStatus,
-                    onPriorityTap: _updatePriority,
-                    session: widget.session,
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _TaskList(
+                        tasks: allTasks,
+                        onStatusTap: _updateStatus,
+                        onPriorityTap: _updatePriority,
+                        session: widget.session,
+                        members: membersSnapshot.data ?? const <MemberEntity>[],
+                      ),
+                      ...TaskStatus.values.map((status) {
+                        final filtered = allTasks
+                            .where((t) => t.status == status)
+                            .toList();
+                        return _TaskList(
+                          tasks: filtered,
+                          onStatusTap: _updateStatus,
+                          onPriorityTap: _updatePriority,
+                          session: widget.session,
+                          members:
+                              membersSnapshot.data ?? const <MemberEntity>[],
+                        );
+                      }),
+                    ],
                   );
-                }),
-              ],
-            );
-          },
+                },
+              ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -172,12 +195,14 @@ class _TaskList extends StatelessWidget {
     required this.onStatusTap,
     required this.onPriorityTap,
     required this.session,
+    required this.members,
   });
 
   final List<TaskEntity> tasks;
   final Function(String, TaskStatus) onStatusTap;
   final Function(String, TaskPriority) onPriorityTap;
   final UserSessionEntity session;
+  final List<MemberEntity> members;
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +224,24 @@ class _TaskList extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 16.h),
           child: TaskCard(
             task: task,
+            assignee: task.assigneeId == null
+                ? null
+                : members.cast<MemberEntity?>().firstWhere(
+                    (member) => member?.id == task.assigneeId,
+                    orElse: () => null,
+                  ),
+            onEdit: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: AppColors.bg,
+              shape: const CutCornerBorder(cut: 20),
+              builder: (_) => CreateTaskSheet(
+                projectId: task.projectId,
+                session: session,
+                members: members,
+                initialTask: task,
+              ),
+            ),
             onStatusTap: () => onStatusTap(task.id!, task.status),
             onPriorityTap: () => onPriorityTap(task.id!, task.priority),
             onDelete: () async {

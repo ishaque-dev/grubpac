@@ -39,6 +39,7 @@ class TaskEntity {
     TaskStatus? status,
     TaskPriority? priority,
     String? assigneeId,
+    bool clearAssignee = false,
     DateTime? dueDate,
     DateTime? createdAt,
   }) {
@@ -49,7 +50,7 @@ class TaskEntity {
       description: description ?? this.description,
       status: status ?? this.status,
       priority: priority ?? this.priority,
-      assigneeId: assigneeId ?? this.assigneeId,
+      assigneeId: clearAssignee ? null : assigneeId ?? this.assigneeId,
       dueDate: dueDate ?? this.dueDate,
       createdAt: createdAt ?? this.createdAt,
     );
