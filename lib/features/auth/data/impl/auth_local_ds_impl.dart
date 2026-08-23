@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:grubpac/core/constants/app_strings.dart';
+import 'package:grubpac/core/utils/mock_data.dart';
 import 'package:grubpac/core/utils/parsing_santizer.dart';
 import 'package:grubpac/features/auth/data/data_sources/i_auth_local_ds.dart';
 import 'package:grubpac/features/auth/data/models/user_session_model.dart';
@@ -32,8 +33,33 @@ class AuthLocalDsImpl implements IAuthLocalDs {
     }
 
     final sessionMap = _decodeJsonMap(sessionJson);
+    final session = UserSessionModel.fromJson(sessionMap);
 
-    return UserSessionModel.fromJson(sessionMap);
+    // Fetch latest user details from mock data source
+    try {
+      final data = await MockApiResponse.load();
+      final users = sanitizeWithType<List<dynamic>>(
+        data[AppJsonKeys.users],
+        defaultValue: <dynamic>[],
+      );
+
+      final userData = users.firstWhere(
+        (user) =>
+            sanitizeWithType<String>(user[AppJsonKeys.id]) == session.userId,
+        orElse: () => null,
+      );
+
+      if (userData != null) {
+        return session.copyWith(
+          userName: sanitizeWithType<String>(userData[AppJsonKeys.name]),
+          avatarUrl: sanitizeWithType<String>(userData['avatar_url']),
+        );
+      }
+    } catch (_) {
+      // Fallback to what was saved if mock data lookup fails
+    }
+
+    return session;
   }
 
   @override
