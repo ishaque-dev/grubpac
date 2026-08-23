@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/features/projects/domain/entities/create_project_request_entity.dart';
@@ -124,7 +125,7 @@ void main() {
     )),
     expect: () => [
       ProjectsLoading(),
-      ProjectsLoaded(projects: [tProject]),
+      ProjectsLoaded(projects: [tProject], message: AppUiStrings.projectCreated),
     ],
   );
 
@@ -143,7 +144,11 @@ void main() {
     )),
     expect: () => [
       ProjectsLoading(),
-      ProjectsLoaded(projects: [tProject], selectedProject: tProject),
+      ProjectsLoaded(
+        projects: [tProject],
+        selectedProject: tProject,
+        message: AppUiStrings.projectUpdated,
+      ),
     ],
   );
 
@@ -157,7 +162,7 @@ void main() {
     act: (bloc) => bloc.add(ProjectDeleteRequested(projectId: '1', session: tSession)),
     expect: () => [
       ProjectsLoading(),
-      const ProjectsLoaded(projects: []),
+      const ProjectsLoaded(projects: [], message: AppUiStrings.projectDeleted),
     ],
   );
 }

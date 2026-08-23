@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:grubpac/core/constants/app_strings.dart';
 import 'package:grubpac/core/session/user_session_entity.dart';
 import 'package:grubpac/core/shared/enums.dart';
 import 'package:grubpac/features/tasks/domain/entities/task_entity.dart';
@@ -119,7 +120,11 @@ void main() {
     act: (bloc) => bloc.add(TaskCreateRequested(task: tTask, session: tSession)),
     expect: () => [
       TaskLoading(),
-      TaskLoaded(tasks: [tTask], selectedTask: tTask),
+      TaskLoaded(
+        tasks: [tTask],
+        selectedTask: tTask,
+        message: AppUiStrings.taskCreated,
+      ),
     ],
   );
 
@@ -139,7 +144,11 @@ void main() {
     )),
     expect: () => [
       TaskLoading(),
-      TaskLoaded(tasks: [tTask.copyWith(status: TaskStatus.done)], selectedTask: tTask.copyWith(status: TaskStatus.done)),
+      TaskLoaded(
+        tasks: [tTask.copyWith(status: TaskStatus.done)],
+        selectedTask: tTask.copyWith(status: TaskStatus.done),
+        message: AppUiStrings.taskStatusUpdated,
+      ),
     ],
   );
 }
